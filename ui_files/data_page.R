@@ -10,21 +10,23 @@ dataPage <- function()tagList(
     column(9,
          tabsetPanel(
              id = "datatabs",
-              tabPanel("Structure",
-                         uiOutput("structureOUT")
-                ),
-              tabPanel("View",
+             
+              tabPanel("Data Table",
                   wellPanel(
                       fluidRow(
                          column(12,offset = 11, 
-                                downloadBttn("downloadTbl", size = "sm")), br(), br(),
+                                downloadBttn("downloadTbl", size = "xs")), br(), br(),
                          column(12,
                                 div(style = 'overflow-x: scroll',
                                     DT::dataTableOutput("viewdt")
                                 ))
                        ), br(), hr(), br()
                   )   
-              )#,
+              ),
+             tabPanel("Structure",
+                      uiOutput("structureOUT")
+             )
+             #,
               # tabPanel("Visualize",
               #          fluidRow(
               #            highchartOutput("hvisualize",height = "700px")

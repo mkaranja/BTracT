@@ -19,8 +19,7 @@ statuspage <- function()tagList(
                            
                   box(width = 12, status = "primary", fill = T, tags$p(style = "color: #FF8C00; font-size: 20px; text-align: center;", "Expanded accession details"),
                       column(12, offset = 11,
-                      downloadBttn("download_current_details")),
-                      #div(style = c('overflow-x: scroll', "font-size: 100%; width: 80%"),
+                      downloadBttn("download_current_details", size = "xs")),
                                        DT::dataTableOutput("current_Table")#), br()
                   )
          ),
@@ -35,7 +34,8 @@ statuspage <- function()tagList(
                     box(width = 12,
                         wellPanel(
                           tags$p(style = "color: #FF8C00; font-size: 18px; text-align: center;","Expanded details"),
-                          column(12, offset = 11,downloadBttn("download_data_flow",size="sm")),
+                          column(12, offset = 11,
+                                 downloadBttn("download_data_flow",size="xs")),
                           DT::dataTableOutput("collapsed_table"), br()
                         )
                       )
@@ -46,7 +46,7 @@ statuspage <- function()tagList(
                     tags$p(style = "color: #FF8C00; font-size: 18px; text-align: center;",
                            "This page shows the accessions which have being dropped from tracking as a result reports of status or contaminations"), br(),
                     column(12,offset = 11, 
-                           downloadBttn("downloadLost", size = "sm")), br(),
+                           downloadBttn("downloadLost", size = "xs")), br(),
                     DT::dataTableOutput("lostTbl"), br()
                   )
               )

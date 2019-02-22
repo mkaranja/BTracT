@@ -20,9 +20,9 @@ dataserver <- function(env_serv) with(env_serv, local({
       if(input$datatabs == "Structure"){
           shinyWidgets::prettyRadioButtons(inputId = "display",label = "Display:", choices = c("str", "summary"),
                                            icon = icon("check"), bigger = F,status = "info")
-        } else if(input$datatabs =="View"){
-          varSelectInput("showVars", "Select variables to show:",datasetInput(),selectize=FALSE, multiple = TRUE, 
-                         size = "20%")
+        } else if(input$datatabs =="Data Table"){
+          selectInput("showVars", "Select variables to show:",names(datasetInput()), multiple = TRUE)
+          
         }
       
     
@@ -38,6 +38,94 @@ dataserver <- function(env_serv) with(env_serv, local({
     #   }
     
   })
+  
+  
+  output$structureOUT <- renderUI({
+    columns = names(datasetInput())
+    if(!is.null(input$showVars)){
+      columns = input$showVars
+    }
+    result = datasetInput()[,..columns, drop=FALSE]
+    
+    div(
+      conditionalPanel(
+        condition = "input.display=='str'",
+          div(
+              fluidRow(br(),
+               tags$p(style = "color: #FF8C00; font-size: 18px;","Data structure"),
+               verbatimTextOutput("dataStr"), br()
+              ),
+              fluidRow(
+                conditionalPanel(condition = "input.dataset=='Flowering'", includeMarkdown('www/variables/flowering.md')),
+                conditionalPanel(condition = "input.dataset=='Crosses'", includeMarkdown('www/variables/bananadata.md')),
+                conditionalPanel(condition = "input.dataset=='Plantlets'", includeMarkdown('www/variables/plantlets.md')),
+                conditionalPanel(condition = "input.dataset=='Status'", includeMarkdown('www/variables/status.md')),
+                conditionalPanel(condition = "input.dataset=='Contamination'", includeMarkdown('www/variables/contamination.md')),br(),hr(), br()
+              ))
+      ),
+    conditionalPanel(
+      condition = "input.display=='summary'",
+      fluidRow(br(),
+         tags$p(style = "color: #FF8C00; font-size: 18px;","Data summary"), 
+         print(dfSummary(result, graph.magnif = 1.0), 
+               method = 'render',
+               omit.headings = TRUE,
+               bootstrap.css = FALSE),
+               br(),hr(), br()
+          )
+       )
+    )
+  })
+  
+  output$dataStr <- renderPrint({
+    columns = names(datasetInput())
+    if(!is.null(input$showVars)){
+      columns = input$showVars
+    }
+    result = datasetInput()[,..columns, drop=FALSE]
+    str(result)
+    })
+  
+  ##################################################
+  # Data Table TAB
+  ##################################################
+  
+  output$viewdt <- DT::renderDataTable({
+    columns = names(datasetInput())
+    if(!is.null(input$showVars)){
+      columns = input$showVars
+    }
+    result = datasetInput()[,..columns, drop=FALSE]
+    
+    DT::datatable(result, filter = 'top', rownames = FALSE, escape = FALSE, 
+                  options = list(pageLength = 5, lengthMenu = c(5, 10, 50, 100, 500,1000),
+                                 searchHighlight=T, stateSave = TRUE))
+   })
+   
+  
+  downloadView <- reactive({
+    columns = names(datasetInput())
+    if(!is.null(input$showVars)){
+      columns = input$showVars
+    }
+    result = datasetInput()[,..columns, drop=FALSE]
+    
+    if(!is.null(input$viewdt_rows_selected)){
+      result = result[input$viewdt_rows_selected,]
+    }
+    return(result)
+  })
+  output$downloadTbl <- downloadHandler(
+    filename = function(){paste(input$dataset,'-', Sys.time(), '.csv')},
+    content = function(file) {
+      write.csv(downloadView(), file, row.names = FALSE) #datasetInput
+    }
+  )
+  
+  
+  ##################################################
+  # PIVOT TAB
+  ##################################################
   
   ##################################################
   # VISUALIZE TAB
@@ -83,89 +171,6 @@ dataserver <- function(env_serv) with(env_serv, local({
     hc
     
   })
-  
-  output$structureOUT <- renderUI({
-    result = datasetInput()
-    div(
-      conditionalPanel(
-        condition = "input.display=='str'",
-          div(
-              fluidRow(br(),
-               tags$p(style = "color: #FF8C00; font-size: 18px;","Data structure"),
-               verbatimTextOutput("dataStr"), br()
-              ),
-              fluidRow(
-                conditionalPanel(condition = "input.dataset=='Flowering'", includeMarkdown('www/variables/flowering.md')),
-                conditionalPanel(condition = "input.dataset=='Crosses'", includeMarkdown('www/variables/bananadata.md')),
-                conditionalPanel(condition = "input.dataset=='Plantlets'", includeMarkdown('www/variables/plantlets.md')),
-                conditionalPanel(condition = "input.dataset=='Status'", includeMarkdown('www/variables/status.md')),
-                conditionalPanel(condition = "input.dataset=='Contamination'", includeMarkdown('www/variables/contamination.md')),br(),hr(), br()
-              ))
-      ),
-    conditionalPanel(
-      condition = "input.display=='summary'",
-      fluidRow(br(),
-         tags$p(style = "color: #FF8C00; font-size: 18px;","Data summary"), 
-         print(dfSummary(result, graph.magnif = 1.0), 
-               method = 'render',
-               omit.headings = TRUE,
-               bootstrap.css = FALSE),
-               br(),hr(), br()
-          )
-       )
-    )
-  })
-  
-  output$dataStr <- renderPrint({
-    result = datasetInput()
-    str(result)
-    })
-  
-  ##################################################
-  # VIEW TAB
-  ##################################################
-  
-  output$viewdt <- DT::renderDataTable({
-    
-    if(length(input$showVars) == 0) result = return(datasetInput())
-    result = datasetInput() %>% dplyr::select(!!!input$showVars)
-    
-     DT::datatable(result, 
-                   style = 'bootstrap', rownames = FALSE, 
-                   filter = list(position = 'top'),
-                   extensions = c('Buttons','FixedColumns','FixedHeader'),
-                   options = list(pageLength = 5, 
-                                  lengthMenu = c(5, 10, 20, 50, 100, 500,1000),
-                                  searchHighlight=T, stateSave = TRUE,
-                                  rowCallback = JS( 'function(row, data) { $("td:eq(5)", row).css("text-align", "center"); }'),
-                                  columnDefs = list(list(className = "dt-head-center dt-center", targets = "_all"))
-                   )
-     )
-   }, escape = FALSE)
-   
-  
-  downloadView <- reactive({
-    if(length(input$showVars) == 0) result = return(datasetInput())
-    result = datasetInput() %>% dplyr::select(!!!input$showVars)
-    
-    if(!is.null(input$viewdt_rows_selected)){
-      result = result[input$viewdt_rows_selected,]
-    }
-    return(result)
-  })
-  output$downloadTbl <- downloadHandler(
-    filename = function(){paste(input$dataset,'-', Sys.time(), '.csv')},
-    content = function(file) {
-      write.csv(downloadView(), file, row.names = FALSE) #datasetInput
-    }
-  )
-  
-  
-  ##################################################
-  # PIVOT TAB
-  ##################################################
-  
-  
   
   ##################################################
   # EXPLORE TAB

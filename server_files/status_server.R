@@ -340,19 +340,11 @@ statusserver <- function(env_serv) with(env_serv, local({
   })
   output$lostTbl <- DT::renderDT({
     
-    DT::datatable(lostInput(), 
-                  style = 'bootstrap', rownames = FALSE, 
-                  filter = 'top',
-                  extensions = c('Buttons','FixedColumns','FixedHeader'),
-                  options = list(pageLength = 5, 
-                                 lengthMenu = c(5, 10, 20, 50, 100, 500,1000),
-                                 #buttons = I('colvis'),
-                                 autoWidth = T, searchHighlight=T, stateSave = TRUE,
-                                 rowCallback = JS( 'function(row, data) { $("td:eq(5)", row).css("text-align", "center"); }'),
-                                 columnDefs = list(list(className = 'dt-center', target = "_all"))
-                  )
-    )
-  }, escape = FALSE)
+    DT::datatable(lostInput(), filter = 'top', rownames = FALSE, escape = FALSE, 
+                  options = list(pageLength = 5, lengthMenu = c(5, 10, 50, 100, 500,1000),
+                                 searchHighlight=T, stateSave = TRUE))
+   
+  })
   
   output$downloadLost <- downloadHandler(
   filename = function(){paste0(input$lostType,"-",Sys.time(),".csv")},

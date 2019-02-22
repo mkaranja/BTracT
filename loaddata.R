@@ -21,9 +21,9 @@ seeds_data = list.files(patt="SeedsGerminatingAfter8Weeks.csv$", recursive = TRU
 seeds_data = seeds_data[complete.cases(seeds_data),]
 seeds_data$Location = as.factor(seeds_data$Location)
 if(nrow(seeds_data)>0){
-seeds_data$`Germination after 8 Weeks Date` = anytime::anydate(seeds_data$`Germination after 8 Weeks Date`)
+seeds_data$Germination_after_8_Weeks_Date = anytime::anydate(seeds_data$Germination_after_8_Weeks_Date)
 } else {
-  seeds_data$`Germination after 8 Weeks Date` = anytime::anydate(as.character(seeds_data$`Germination after 8 Weeks Date`))
+  seeds_data$Germination_after_8_Weeks_Date = anytime::anydate(as.character(seeds_data$`Germination after 8 Weeks Date`))
 }
 colnames(seeds_data) = gsub("_"," ",names(seeds_data))
 
@@ -135,7 +135,36 @@ status$Location = as.factor(status$Location)
 bananadata = dplyr::anti_join(bananadt, status, by="StatusID")
 bananadata$StatusID = NULL
 
-##########################################################################
+###################################
+bananadata$Mother = stringr::str_trim(bananadata$Mother, side = "both")
+bananadata$Father = stringr::str_trim(bananadata$Father, side = "both")
+bananadata$Father = gsub(" - ","-",bananadata$Father)
+
+bananadata$Mother = ifelse(bananadata$Mother %in% c("cv-Rose","ITC0712"),"ITC0712 Cv Rose", bananadata$Mother)
+bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC0609","Pahang","Pisang Pahang"),"ITC0609 Pahang", bananadata$Mother)
+bananadata$Mother = ifelse(bananadata$Mother %in% c("Calcutta 4","ITC0249"),"ITC0249 Calcutta 4", bananadata$Mother)
+bananadata$Mother = ifelse(bananadata$Mother %in% c("Borneo","ITC0253"),"ITC0253 Borneo", bananadata$Mother)
+bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC0766","Paliama"),"ITC0766 Paliama", bananadata$Mother)
+bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC1460","Ijihu nkundu"),"ITC1460-Ijihu nkundu", bananadata$Mother)
+bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC1468","Kahuti"),"ITC1468-Kahuti", bananadata$Mother)
+
+bananadata$Father = ifelse(bananadata$Father %in% c("cv-Rose","ITC0712"),"ITC0712 Cv Rose", bananadata$Father)
+bananadata$Father = ifelse(bananadata$Father %in% c("ITC0609","Pahang","Pisang Pahang"),"ITC0609 Pahang", bananadata$Father)
+bananadata$Father = ifelse(bananadata$Father %in% c("Calcutta 4","ITC0249"),"ITC0249 Calcutta 4", bananadata$Father)
+bananadata$Father = ifelse(bananadata$Father %in% c("Borneo","ITC0253"),"ITC0253 Borneo", bananadata$Father)
+bananadata$Father = ifelse(bananadata$Father %in% c("ITC0766","Paliama"),"ITC0766 Paliama", bananadata$Father)
+bananadata$Father = ifelse(bananadata$Father %in% c("ITC1460","Ijihu nkundu"),"ITC1460-Ijihu nkundu", bananadata$Father)
+bananadata$Father = ifelse(bananadata$Father %in% c("ITC1468","Kahuti"),"ITC1468-Kahuti", bananadata$Father)
+
+# library(brapi)
+# mb = brapi::ba_db()$musabase
+# accessions = brapi::ba_germplasm_search(mb, rclass="data.frame") %>%
+#   dplyr::select(germplasmName,synonyms)
+# 
+# bananadata$Mother = ifelse(bananadata$Mother %in% accessions$synonyms, accessions$germplasmName, bananadata$Mother)
+# bananadata$Father = ifelse(bananadata$Father %in% accessions$synonyms, accessions$germplasmName, bananadata$Father)
+
+#######################################
 bananadata = bananadata %>%
   dplyr::select(Location, Crossnumber, FemalePlotName, Mother, MalePlotName, Father, First_Pollination_Date, Number_of_repeat_pollinations,
                 Days_to_Maturity,Bunch_Harvest_Date, Days_in_ripening_shed, everything(), -c(Cycle,starts_with("Repeat_Pollination_Date.")))
@@ -294,15 +323,6 @@ if(nrow(plantlets)>0){
 
 cleantable = plyr::rbind.fill(flowered,first_pollinationed,repeat_pollinationed,
                               harvested,extracted,rescued,germinated_2weeks,germinated_8weeks)
-cleantable$Mother = stringi::stri_trans_totitle(tm::stripWhitespace(as.character(gsub(" -","_", cleantable$Mother))))
-cleantable$Mother = ifelse(substr(cleantable$Mother,1,3)=='Itc',gsub('Itc','ITC', cleantable$Mother), cleantable$Mother)
-cleantable$Mother = ifelse(substr(cleantable$Mother,1,4)=='Iita',gsub('Iita','IITA', cleantable$Mother), cleantable$Mother)
-cleantable$Mother = ifelse(substr(cleantable$Mother,1,2)=='Sh',gsub('Sh','SH', cleantable$Mother), cleantable$Mother)
-
-cleantable$Father = stringi::stri_trans_totitle(tm::stripWhitespace(as.character(gsub(" -","_", cleantable$Father))))
-cleantable$Father = ifelse(substr(cleantable$Father,1,3)=='Itc',gsub('Itc','ITC', cleantable$Father), cleantable$Father)
-cleantable$Father = ifelse(substr(cleantable$Father,1,4)=='Iita',gsub('Iita','IITA', cleantable$Father), cleantable$Father)
-cleantable$Father = ifelse(substr(cleantable$Father,1,2)=='Sh',gsub('Sh','SH', cleantable$Father), cleantable$Father)
 
 #rooted,subcul, screen_housed,hardened,open_field,statusD)
 # cleantable = cleantable %>%

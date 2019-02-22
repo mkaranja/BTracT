@@ -13,11 +13,11 @@ source("server_files/data_server.R")
 source("server_files/status_server.R")
 source("server_files/feedback_server.R")
 source("server_files/searchbox.R")
-
-# Define server logic required to draw a histogram
+source("server_files/tc_server.R")
+# Define server logic 
 shinyServer(
   function(input, output, session) {
-    session$onSessionEnded(stopApp) # Automatically stop a Shiny app when closing the browser tab
+  # session$onSessionEnded(stopApp) # Automatically stop a Shiny app when closing the browser tab
    
   env_serv = environment()
   
@@ -32,6 +32,9 @@ shinyServer(
   
   # status page
   statusserver(env_serv)
+  
+  # tissue culture labels
+  tc_server(env_serv)
   
   # feedback
   feedbackserver(env_serv)

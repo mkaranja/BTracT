@@ -1,5 +1,6 @@
 
 source("loaddata.R")
+source("tc_load.R") # tissue culture data
 
 datevalue = c(min(anytime::anydate(cleantable$Date)),max(anytime::anydate(cleantable$Date)))
 datemin = min(lubridate::ymd(cleantable$Date))

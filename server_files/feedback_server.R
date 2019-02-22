@@ -28,17 +28,7 @@ feedbackserver <- function(env_serv) with(env_serv, local({
 
 # Gather all the form inputs (and add timestamp)
 formData <- reactive({
-  
-  validate(
-    need(input$Name !="", 
-         paste("Enter your name")),
-    need(input$Organization !="", 
-         paste("Enter your organization name")),
-    need(input$Message !="", 
-         paste("Type in your message")),
-    need(isValidEmail(input$Email),
-         paste("Enter a valid E-mail address"))
-  )
+
   data <- sapply(fieldsAll, function(x) input[[x]])
   data <- c(data, Timestamp = epochTime())
   data <- t(data)
@@ -84,7 +74,7 @@ output$adminPanelContainer <- renderUI({
     
     div(
       id = "adminPanel",
-      tags$p(style = "color: orange; font-size: 24px; text-align: center;","Feedback (only visible to admins)"),
+      tags$p(style = "color: orange; font-size: 18px; text-align: center;","Feedback (only visible to admins)"),
       DT::dataTableOutput("feedbackTable"),br(),
       downloadBttn("downloadBtn", "Download"), br()
       
