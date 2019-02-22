@@ -1,2 +1,3 @@
-# BTracT
-An interactive and analytic dashboard developed in R and Shiny for querying banana breeding information collected using BTracT tool
+# BTracT - Banana Crosses Tracking Tool
+A real-time application to monitor banana breeding activities.
+This app is live at https://iita.shinyapps.io/btract/
