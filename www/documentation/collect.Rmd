@@ -1,0 +1,129 @@
+---
+title: "BTracT data Collection Tool"
+subtitle: "Guidelines of using BTracT (Banana Tracking Tool)"
+
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: false
+    background-size: cover
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2.	BTracT Tool Set-up
+
+----
+
+<b> Requirements: </b>
++ Android phone/ tablet
++ zebra ZQ520 mobile printer
+
+---
+
+<b> Installation: </b> 
+<br>
+
+On your mobile phone, go to play store and download
+    + ODK collect
+    + ODK sensors
+    + ODK Zebra Printer - Apk provided
+
+---
+<b> Setup: </b> Open ODK collect
+Go to the Menu 
+
+<br>
+
+![](images/trackingtool/b1.png)
+
+----
+
+General settings
+
+<br>
+
+![](images/trackingtool/b2.png)
+
+----
+
+Server settings,
+
+<br>
+
+![](images/trackingtool/b3.png) 
+
+<br>
+
+Tab to edit these fields,
+URL:https://ona.io,
+Username: your username
+Password: your password
+
+<br>
+
+![](images/trackingtool/b4.png) 
+
+<br>
+
+Form management >> Go to the MENU,
+
+<br>
+
+![](images/trackingtool/b5.png)
+
+<br>
+
+Auto send >> wifi/ data
+
+<br>
+
+![](images/trackingtool/b6.png)
+
+<br>
+
+
+# 3.  Data collection
+
+1.	Get Blank form
+
+<br>
+
+![](images/trackingtool/c1.png)
+
+---
+
+Select BtractTest form and Get Selected at the bottom
+
+<br>
+
+![](images/trackingtool/c2.png)
+
+---
+
+Select Fill Blank form
+
+<br>
+
+![](images/trackingtool/c3.png), 
+
+---
+
+Select 'BtractTest'. Swipe forward to proceed 
+Activities category >> user >> specific activity 
+
+<br>
+
+## 3.1 Field Activities
+            
+
+---
+
+## 3.2 Laboratory
+
+---
+
+## 3.3 Nursery
+

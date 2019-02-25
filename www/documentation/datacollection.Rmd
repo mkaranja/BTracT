@@ -1,0 +1,79 @@
+---
+title: Data Collection
+subtitle: Get started
+
+output:
+  ioslides_presentation:
+    widescreen: true
+---
+
+## Get Blank form
+
+<div class="columns-2">
+
+Loads your form and data
+
+to the device
+
+![](images/btract/configuration/c1.png)
+</div>
+
+
+## Select form by site
+<div class="columns-2">
+For example, select BtractTest <br>
+Load the form by selecting <b>Get selected </b>at the bottom of the screen
+
+![](images/btract/configuration/c2.png)
+
+<br> <br> <br> <br> <br>
+
+![](images/btract/configuration/d2.png)
+
+</div>
+
+## Start data collection
+
+a. Fill Blank form
+
+<div class="columns-2">
+
+Select the loaded form in the previous step
+
+<b>BTractTest</b>
+
+![](images/btract/configuration/d3.png)
+
+</div>
+
+---
+
+<b>Use swipes or forward buttons to go to the next screen</b>
+
+<div class="columns-2">
+
+  * Select <b>Record information</b>
+  * Proceed to select activity category
+
+
+![](images/btract/configuration/da.png)
+
+
+<br><br><br><br>
+
+
+![](images/btract/configuration/db.png)
+
+</div>
+
+
+---
+
+<div class="columns-2">
+
+Select either depending on your work
+
+<br><br><br>
+
+![](images/btract/configuration/dc.png)
+</div>

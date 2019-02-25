@@ -1,0 +1,111 @@
+---
+title: Configure BTracT
+subtitle: Data Collection Tool
+
+output:
+  ioslides_presentation:
+    widescreen: true
+---
+
+## What you need 
+
+  <div class="columns-2">
+
+  - Android mobile phone or tablet
+  
+  - Zebra ZQ520 mobile printer
+  
+  ![](images/btract/configuration/mobile.png)
+  ![](images/btract/configuration/zq.png)
+    
+  </div>
+
+## Install apps 
+
+On your mobile phone, go to <b>play store</b> and download
+  
++  [ODK collect](https://play.google.com/store/apps/details?id=org.odk.collect.android&hl=en)
++  [ODK Sensors Framework](https://play.google.com/store/apps/details?id=org.opendatakit.sensors&hl=en)
++  ODK printer driver (contact admin)
+
+
+## Configuration
+
+  <div class="columns-2">
+  <b>Open ODK collect </b>
+  <br>
+  ![](images/btract/configuration/odk.png)
+  
+  <br>
+  Go to the Menu (top right corner)
+  
+  ![](images/btract/configuration/b1.png)
+
+  </div>
+
+---
+
+### a. Login details
+
+<div class="columns-2">
+
+Go to <b>General settings</b> as indicated in the fig
+
+
+
+![](images/btract/configuration/b2.png)
+</div>
+
+<br>
+
+---
+
+Select <b>Server </b> settings
+
+![](images/btract/configuration/b3.png) 
+
+---
+
+Replace the default information with your <u> login info</u>
+
+<br>
+
+<div class="columns-2">
+
+<b>URL:</b> <em>https://ona.io</em>
+
+<b>Username:</b> <em>your username</em>
+
+<b>Password:</b> <em>your password</em>
+
+![](images/btract/configuration/b4.png) 
+
+</div>
+
+---
+
+### b. Form management
+
+<br>
+
+<div class="columns-2">
+
+Go to the MENU
+
+
+![](images/btract/configuration/b5.png)
+
+<br>
+
+Select auto send - set to wifi or data
+
+![](images/btract/configuration/b6.png)
+
+
+
+
+<div align="center">
+
+# End of Configuration
+
+</div>

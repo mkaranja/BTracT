@@ -1,0 +1,179 @@
+---
+title: Untitled
+author: Margaret
+date: 2018 M11 20
+output: slidy_presentation
+---
+
+# Using BTracT Dashboard 
+
+
+This is the vizualization and analytic tool of banana crosses and seeds recorded using BTracT (Banana Tracking Tool. 
+Summary data is shown in the overview tab where more details is displayed in the tables and status tabs. 
+
+## Data Tables
+       
+Data tables has many useful options such as search and filters (just below the table headers as describe below; 
+        
+Search Box: Located at top-right corner of data table. Use to search values within the table
+Table Filters: Filter within column. Multiple filters are posible for a fine view
+Page Length: Shows number of entries to display in the table
+Use the , <b>Download</b> button at bottom of table to download data. Selecting specific rows, subsets the data downloaded.
+         
+<br>
+
+img(src = documentation/images/dashboard/tables.png)
+
+         
+Plots
+         
+Most of the plots are reactive to mouse click. By clicking a plot bar or node drills-down to detailed information. 
+ Plots can also be drilled-down using the filters given. , 
+ To save the plot, right click on it and then select, b(save picture as. 
+ In the resulting dialog box, select the location to save the image and type in the image name in the , <b>File name box</b>.
+ 
+<br>
+
+img(src = documentation/images/dashboard/plot.png
+
+
+         
+Value Boxes
+         
+      p(style = color: black; font-size: 17px; font-family: Lobster;,
+             Valueboxes are found in the overview tab. They give a quick overview summary of number of accessions, seeds or plantlets recorded at variuos stages
+      img(src = documentation/images/dashboard/overview_vb.png
+         
+      p(style = color: black; font-size: 17px; font-family: Lobster;,
+             Clicking the valebox opens up detailed table with accessions. Data is downloadable using the Download button at the bottom of the table
+      img(src = documentation/images/dashboard/bs_tables.png
+        
+
+Download data
+      p(style = color: black; font-size: 17px; font-family: Lobster;,
+             To download table data, click on the download button at bottom of the table. If no row is selected, all data in the data table will be downloaded. Selecting specific rows subsets data to be downloaded
+ br(
+
+
+     
+   
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Tab 2
+tabPanel(h5(Data Collection Tool
+div(
+column(9, offset = 1,
+Guidelines of using BTracT (Banana Tracking Tool 
+ A.	Generate the crossing plan 
+
+
+Crossing plan is generated with permissions through musabase.org
+p(To create a wish list, go to manage menu >> select crosses 
+img(src = documentation/images/trackingtool/1.png 
+
+Click on Add Cross Wishlist (see highlight 
+img(src = documentation/images/trackingtool/2.png 
+
+Select your tool, specific to your site
+Not using lists - using trial names 
+img(src = documentation/images/trackingtool/3.png 
+
+p(Select the Female and Male trials. Select the specific accessions and assign priority >> Next
+img(src = documentation/images/trackingtool/4.png 
+
+Using lists
+img(src = documentation/images/trackingtool/5.png 
+
+b(>> Next  
+
+p(Select all female plots or specific plots needed.
+img(src = documentation/images/trackingtool/6.png br(
+  
+
+B.	BTracT Tool Set-up
+
+Requirements: Android phone
+Installation: On your mobile phone, go to play store and download 
+ ODK collect
+ ODK sensors
+ ODK Zebra Printer - Apk provided
+
+Setup: Open ODK collect
+Go to the Menu 
+img(src = documentation/images/trackingtool/b1.png 
+
+General settings
+img(src = documentation/images/trackingtool/b2.png 
+
+Server settings
+img(src = documentation/images/trackingtool/b3.png 
+
+Tab to edit these fields
+
+ URL:https://ona.io
+ Username: your username
+ Password: your password
+ 
+
+img(src = documentation/images/trackingtool/b4.png 
+
+Form management >> Go to the MENU
+img(src = documentation/images/trackingtool/b5.png 
+
+Auto send >> wifi/ data
+img(src = documentation/images/trackingtool/b6.png br(
+
+  
+
+
+Data collection
+
+g.	Get Blank form
+img(src = documentation/images/trackingtool/c1.png 
+
+Select BtractTest form and Get Selected at the bottom
+img(src = documentation/images/trackingtool/c2.png 
+
+Select Fill Blank form
+img(src = documentation/images/trackingtool/c3.png 
+Select 'BtractTest'. Swipe forward to proceed 
+Activities category >> user >> specific activity  
+
+h4(style = color: red, Field Activities
+
+
+  
+
+     
+
+
+
+Feedback/ comments
+      img(src = .../bbb.png
+      img(src = .../iita.png
+      img(src = .../bti.png
+  
+
+
+h3(Software and packages
+p(This dashboard and the report are made possible through the use of the R software and the following packages: 
+
+Open data kit
+Musabase
+R for statistical analysis
+
+
+
+
+shiny: Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and Jonathan McPherson (2015. shiny: Web Application Framework for R. R package version 0.12.1. http://CRAN.R-project.org/package=shiny
+
+DT:Yihui Xie (2014. DT: R Interface to the jQuery Plug-in DataTables. R package version 0.0.34. http://rstudio.github.io/DT
+
+data.table: M Dowle, T Short, S Lianoglou, A Srinivasan with contributions from R Saporta and E Antonyan (2014. data.table: Extension of data.frame. R package version 1.9.4. http://CRAN.R-project.org/package=data.table
+
+shinyBS: Eric Bailey (2015. shinyBS: Twitter Bootstrap Components for Shiny. R package version 0.61. http://CRAN.R-project.org/package=shinyBS
+
+highcharter: Joshua Kunst, Nuno Agostinho (hchart.survfit, densities and hc_add_series_scatter Eduardo Flores (2017. A Wrapper for the 'Highcharts' Library.  
+
+collapsibleTree: A Khan, D Shah, M Bostock (2018. Interactive Collapsible Tree Diagrams using 'D3.js'. https://cran.r-project.org/web/packages/collapsibleTree/index.html
+
+dplyr: Hadley Wickham, Romain Fran?ois, Lionel Henry, Kirill M?ller, RStudio. A Grammar of Data Manipulation. https://cran.r-project.org/web/packages/dplyr/index.html

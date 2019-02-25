@@ -1,0 +1,7 @@
+---
+title: Flowering
+output:
+  ioslides_presentation:
+    widescreen: true
+---
+
