@@ -1,0 +1,112 @@
+---
+title: First pollination
+output:
+  ioslides_presentation:
+    widescreen: true
+---
+
+## First pollination
+
+<div class="columns-2">
+
+Select First pollination
+
+![](fpa.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+</div>
+
+## Geopoint (optional)
+
+<div class="columns-2">
+
+Record the geopoint of the female plant
+
+![](fp1.png)
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+</div>
+
+## First pollination date
+
+<div class="columns-2">
+
+First pollination date - today's date
+
+![](fp3.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+</div>
+
+## Female plant
+
+<div class="columns-2">
+
+Scan the female plant barcode
+
+![](fp2.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+</div>
+
+## Male genotype
+
+<div class="columns-2">
+
+Select the male genotype wrt priority and availability of pollen
+
+![](fp5.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+</div>
+
+
+## Male plant
+
+<div class="columns-2">
+
+Scan the male plant whose genotype has been selected in the previous step
+
+![](fp6.png)
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+</div>
+
+
+## Print CrossID
+
+<div class="columns-2">
+
+A crossID is automatically generated. Proceed to print the ID and label the plant
+
+![](fp7.png)
+
+---
+
+Use the label to tag the cross made
+
+![](fp9.png)
+
+</div>
+
+
+
+<div class="columns-2">
+
+Click on <span style='color:blue> DO NOT ADD</span>
+
+![](../fl5.png)
+
+
+## Save and Exit
+
+Check <span style='color:blue'>Mark as finalized</span>
+
+Click on save and exit to save the record
+
+![](../fl6.png)
+
+</div>

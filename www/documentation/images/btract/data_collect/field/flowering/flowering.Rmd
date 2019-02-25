@@ -1,0 +1,51 @@
+---
+title: Flowering
+output:
+  ioslides_presentation:
+    widescreen: true
+---
+
+## Select flowering/ shooting
+
+![](fl1.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+
+## Scan the flowering plant barcode
+
+![](fl2.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+## Flowering date
+
+Select today's date
+
+![](fl3.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+## Select plant sex
+
+![](fl4.png)
+
+<p style="text-align:center"><b>Swipe forward</b></p>
+
+## Save and Exit
+
+<div class="columns-2">
+Click on <span style='color:blue> DO NOT ADD</span>
+
+![](../fl5.png)
+
+
+---
+Make sure the check box
+<span style='color:blue'>mark as finalized</span> is checked
+
+Click on <span style='color:blue'>save and exit</span> to save the record
+
+![](../fl6.png)
+
+</div>
