@@ -10,7 +10,7 @@ library(highcharter)
 library(lubridate)
 
 overviewserver <- function(env_serv) with(env_serv, local({
-
+  
   # RESET
   
   observeEvent(input$reset_overview, {
@@ -562,51 +562,40 @@ overviewserver <- function(env_serv) with(env_serv, local({
   
   
   # parents
-  # 
-  # # Call functions from ECharts2Shiny to render charts
-  # wcloudInput <- reactive({
-  #    result = dplyr::select(bananadata,Location, Mother, Father, `First Pollination Date`) %>%
-  #      dplyr::filter(`First Pollination Date` %between% c(input$dateRange[1],input$dateRange[2]))
-  #    
-  #    if(input$site !="All"){
-  #         result <- result[Location == input$site & `First Pollination Date` %between% c(input$dateRange[1],input$dateRange[2])]
-  #    } 
-  #   result$Mother
-  #  })
-  # 
-  # # Radar Chart
-  #  renderWordcloud("parents", data = as.vector(wcloudInput()),
-  #                  shape = "circle",
-  #                  sizeRange = c(10,100),
-  #                  grid_size = 5)
-  #  
+  parentsInput <- reactive({
+    result <- bananadata %>%
+      dplyr::select(Location,Crossnumber,Mother, Father,`First Pollination Date`) %>%
+      dplyr::filter(`First Pollination Date` %between% c(input$dateRange[1], input$dateRange[2]))
+    
+    if((input$dateRange[2] - input$dateRange[1]) < 31){
+      result = result %>%
+        dplyr::filter(`First Pollination Date` >= input$dateRange[1],
+                      `First Pollination Date` <= input$dateRange[2])
+    } else if((lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1]))){
+      result <- dplyr::filter(result,
+                              lubridate::year(`First Pollination Date`) == lubridate::year(input$dateRange[1]),
+                              lubridate::month(`First Pollination Date`) %between% c(lubridate::month(input$dateRange[1]),lubridate::month(input$dateRange[2])))
+    }  else if((lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
+      result <- dplyr::filter(result,
+                              lubridate::year(`First Pollination Date`) %between% c(lubridate::year(input$dateRange[1]), lubridate::year(input$dateRange[2])))
+    }
+    
+    if(input$site !="All"){
+      result = result %>%
+        dplyr::filter(Location == input$site)
+    }
+    result
+  })
   
    output$mother <- renderHighchart({
-     bananadata$`First Pollination Date`=as.Date(bananadata$`First Pollination Date`)
-     dt <- setDT(bananadata)[,c("Location","Crossnumber","Mother", "Father","First Pollination Date")] 
-     dt = dt[,year := format(`First Pollination Date`,"%Y")]
-     dt[,month := format(`First Pollination Date`,"%m")]
-     dt[,day := format(`First Pollination Date`,"%d")]
+    
+     result = parentsInput() %>%
+       dplyr::group_by(Mother) %>%
+       dplyr::tally() %>%
+       dplyr::arrange(desc(n)) %>%
+       dplyr::collect()
      
-     result = dt[complete.cases(dt),]
-     
-     if(input$site !="All" && (input$dateRange[2] - input$dateRange[1]) < 31){
-       result <- result[Location %in% input$site & `First Pollination Date` %between% c(input$dateRange[1],input$dateRange[2])]
-       
-     } else if(input$site !="All" && (lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1]))){
-       result <- result[Location %in% input$site & year == lubridate::year(input$dateRange[1]) &
-                        month %between% c(lubridate::month(input$dateRange[1]), lubridate::month(input$dateRange[2]))]
-       
-     }  else if(input$site != "All" && (lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
-       result <- result[Location %in% input$site & year %between% c(lubridate::year(input$dateRange[1]), lubridate::year(input$dateRange[2]))]
-       
-     }
-     else if(input$site == "All"){
-       result <- result
-     }
-     
-     
-     result <- result[,.N,by=.(Mother)][order(-N)]
+     # plot title
      ptitle = if(input$site !="All"){
        paste(input$site,"Female plants (",input$dateRange[1],"-",input$dateRange[2],")")
      } else if(input$site =="All"){
@@ -614,7 +603,7 @@ overviewserver <- function(env_serv) with(env_serv, local({
      }  
      
      highchart() %>%
-       hc_add_series(data = result$N,type = "bar",name = paste("Female plants")) %>%
+       hc_add_series(data = result$n,type = "bar",name = paste("Female plants")) %>%
        hc_xAxis(categories = result$Mother,tickmarkPlacement="on") %>%
        hc_exporting(enabled = TRUE) %>% 
        hc_tooltip(crosshairs = TRUE, backgroundColor = "#FCFFC5",
@@ -624,61 +613,21 @@ overviewserver <- function(env_serv) with(env_serv, local({
    })
    
    output$totalFemales <- renderUI({
-     bananadata$`First Pollination Date`=as.Date(bananadata$`First Pollination Date`)
-     dt <- setDT(bananadata)[,c("Location","Crossnumber","Mother", "Father","First Pollination Date")] 
-     dt = dt[,year := format(`First Pollination Date`,"%Y")]
-     dt[,month := format(`First Pollination Date`,"%m")]
-     dt[,day := format(`First Pollination Date`,"%d")]
      
-     result = dt[complete.cases(dt),]
-     
-     if(input$site !="All" && (input$dateRange[2] - input$dateRange[1]) < 31){
-       result <- result[Location %in% input$site & `First Pollination Date` %between% c(input$dateRange[1],input$dateRange[2])]
-       
-     } else if(input$site !="All" && (lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1]))){
-       result <- result[Location %in% input$site & year == lubridate::year(input$dateRange[1]) &
-                          month %between% c(lubridate::month(input$dateRange[1]), lubridate::month(input$dateRange[2]))]
-       
-     }  else if(input$site != "All" && (lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
-       result <- result[Location %in% input$site & year %between% c(lubridate::year(input$dateRange[1]), lubridate::year(input$dateRange[2]))]
-       
-     }
-     else if(input$site == "All"){
-       result <- result
-     }
-     
-     
-     result <- result %>% 
+     result <- parentsInput() %>% 
        dplyr::summarize(dplyr::n_distinct(Mother))
      paste0("N = ", result)
    })
    #.....................................................................................MALES 
    output$father <- renderHighchart({
-     bananadata$`First Pollination Date`=as.Date(bananadata$`First Pollination Date`)
-     dt <- setDT(bananadata)[,c("Location","Crossnumber","Mother", "Father","First Pollination Date")] 
-     dt = dt[,year := format(`First Pollination Date`,"%Y")]
-     dt[,month := format(`First Pollination Date`,"%m")]
-     dt[,day := format(`First Pollination Date`,"%d")]
      
-     result = dt[complete.cases(dt),]
-     
-     if(input$site !="All" && (input$dateRange[2] - input$dateRange[1]) < 31){
-       result <- result[Location %in% input$site & `First Pollination Date` %between% c(input$dateRange[1],input$dateRange[2])]
+     result <- parentsInput() %>%
+       group_by(Father) %>%
+       dplyr::tally() %>%
+       arrange(desc(n)) %>%
+       dplyr::collect() 
        
-     } else if(input$site !="All" && (lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1]))){
-       result <- result[Location %in% input$site & year == lubridate::year(input$dateRange[1]) &
-                          month %between% c(lubridate::month(input$dateRange[1]), lubridate::month(input$dateRange[2]))]
-       
-     }  else if(input$site != "All" && (lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
-       result <- result[Location %in% input$site & year %between% c(lubridate::year(input$dateRange[1]), lubridate::year(input$dateRange[2]))]
-       
-     }
-     else if(input$site == "All"){
-       result <- result
-     }
-     
-     result <- result[,.N,by=.(Father)][order(-N)]
-     
+     # plot title
      ptitle = if(input$site !="All"){
        paste(input$site,"Male plants (",input$dateRange[1],"-",input$dateRange[2],")")
      } else if(input$site =="All"){
@@ -686,7 +635,7 @@ overviewserver <- function(env_serv) with(env_serv, local({
      }
      
      highchart() %>%
-       hc_add_series(data = result$N, type = "bar",name = paste("Male plants")
+       hc_add_series(data = result$n, type = "bar",name = paste("Male plants")
        ) %>%
        hc_xAxis(categories = result$Father,tickmarkPlacement="on") %>%
        hc_exporting(enabled = TRUE) %>% 
@@ -697,31 +646,8 @@ overviewserver <- function(env_serv) with(env_serv, local({
    })
    
    output$totalMales <- renderUI({
-     bananadata$`First Pollination Date`=as.Date(bananadata$`First Pollination Date`)
-     dt <- setDT(bananadata)[,c("Location","Crossnumber","Mother", "Father","First Pollination Date")] 
-     dt = dt[,year := format(`First Pollination Date`,"%Y")]
-     dt[,month := format(`First Pollination Date`,"%m")]
-     dt[,day := format(`First Pollination Date`,"%d")]
      
-     result = dt[complete.cases(dt),]
-     
-     if(input$site !="All" && (input$dateRange[2] - input$dateRange[1]) < 31){
-       result <- result[Location %in% input$site & `First Pollination Date` %between% c(input$dateRange[1],input$dateRange[2])]
-       
-     } else if(input$site !="All" && (lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1]))){
-       result <- result[Location %in% input$site & year == lubridate::year(input$dateRange[1]) &
-                          month %between% c(lubridate::month(input$dateRange[1]), lubridate::month(input$dateRange[2]))]
-       
-     }  else if(input$site != "All" && (lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
-       result <- result[Location %in% input$site & year %between% c(lubridate::year(input$dateRange[1]), lubridate::year(input$dateRange[2]))]
-       
-     }
-     else if(input$site == "All"){
-       result <- result
-     }
-     
-     
-     result <- result %>% 
+     result <- parentsInput() %>% 
        dplyr::summarize(dplyr::n_distinct(Father))
      paste0("N = ", result)
    })
