@@ -1,0 +1,16 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Variables
+
++ Site = project field location
++ PlantID = plant unique identifier              
++ Planting Date  =  date of planting      
++ First Bagging Date  =  first time bagging date
++ Last Bagging Date   =  last date of bagging
++ Total Bags = cummulate number of bagged flowers per plant
++ Number OfBagging Days = total days of bagging the plant
++ Accession Name = accession name
+

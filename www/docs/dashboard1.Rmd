@@ -1,0 +1,34 @@
+---
+title: "Using BTracT Dashboard"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::html_clean:
+    theme: cosmo
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    number_sections: true 
+---
+
+# Introduction
+
+This a real-time application to monitor banana breeding activities. The dashboard provides instance access to data as it being collected and saved. Useful for querying and analytics.
+
+<br>
+
+## Overview
+
+
+
+## Data tab
+
+This tab contains the detailed information of all data collected. 
+There are three sub-tabs of data table, summary table and the structure.
+
+  + Data table: displays raw data of all records of crosses made, plantlets, plant status, flowering plants and contamination. Sidebar filters as well as table filters can be used to subset the data in data. You can download all or subsetted data using the download button at the top right corner of the data table
+  
+  + Summary table: this table displays the summary information by location and uniqueness of parents. for instance, number of all crosses in Arusha between the 'Akondro mainty' x	'ITC0712 Cv Rose' genotypes
+  
+  + Structure: shows the datasets structure
+  
+
