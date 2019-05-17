@@ -43,7 +43,6 @@ accessions_links$link = paste0("<a href='",accessions_links_in_musabase$link,"'>
 mutate(Action = paste('<a class="go-map" href="" data-lat="', Lat, '" data-long="', Long, '" data-zip="', Zipcode, '"><i class="fa fa-crosshairs"></i></a>', sep=""))
 
 
-fwrite(accessions_links, file = 'C:/Users/Margaret/Desktop/btracttestt2/data/accessions_links_in_musabase.csv', row.names = F)
+fwrite(accessions_links, file = '../data/accessions_links_in_musabase.csv', row.names = F)
 
-flowerlist = as.character(unique(flowering$Genotype))
 
