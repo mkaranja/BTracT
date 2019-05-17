@@ -23,7 +23,7 @@ statuspage <- function()tagList(
                                        DT::dataTableOutput("current_Table")
                   )
          ),
-         tabPanel('Scheduler',
+         tabPanel('Schedule',
                   uiOutput('schedulerOut')
                   ),
          
