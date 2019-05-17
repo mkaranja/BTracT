@@ -8,18 +8,44 @@
 #
 
 library(shiny)
+library(shinyjs)
+library(shinycssloaders)
+library(shinyURL)
+library(slickR)
+library(knitr)
+
 source("server_files/overview_server.R")
 source("server_files/data_server.R")
 source("server_files/status_server.R")
 source("server_files/feedback_server.R")
 source("server_files/searchbox.R")
 source("server_files/tc_server.R")
+source("server_files/labels_server.R")
+
+
 # Define server logic 
 shinyServer(
   function(input, output, session) {
-  # session$onSessionEnded(stopApp) # Automatically stop a Shiny app when closing the browser tab
+  shinyURL.server()
+  # Automatically stop a Shiny app when closing the browser tab
+  #session$onSessionEnded(stopApp) 
    
+ 
+  # Simulate work being done for 1 second
+  Sys.sleep(2)
+  
+  # Hide the loading message when the rest of the server function has executed
+  hide(id = "loading-content", anim = TRUE, animType = "fade")    
+  show("app-content")
+
+  
   env_serv = environment()
+  
+  # home page slide images
+  output$slickr <- renderSlickR({
+    imgs <- list.files("www/sliders/", pattern=".png", full.names = TRUE)
+    slickR(imgs)
+  })
   
   # searchbox
   searchbox(env_serv)
@@ -38,4 +64,17 @@ shinyServer(
   
   # feedback
   feedbackserver(env_serv)
+  
+  # labels
+   #labels(env_serv)
+  
+  # Update data
+  # Docs
+  
+  #withMathJax(includeMarkdown("www/docs/usingbtract.Rmd"))
+  session$allowReconnect("force")
+  
+  observeEvent(input$refresh, {
+     session$reload()
+   })
 })

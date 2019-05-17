@@ -1,40 +1,37 @@
 
 library(magrittr)
 library(data.table)
-library(dplyr)
+library(plyr); library(dplyr)
 
+#source('accessions_links_in_musabase.R')
+accessions_links_in_musabase = fread('data/accessions_links_in_musabase.csv')
+
+#setwd("./data")
 # Load data 
 flowering = list.files(patt="AllFlowering.csv$", recursive = TRUE) %>%
   lapply(fread) %>%
   rbindlist(id=T, fill=T) %>%
-  .[,-1]
-flowering$Location = as.factor(flowering$Location)
-flowering$Accession_Name = as.factor(flowering$Accession_Name)
-flowering$Plant_Sex = as.factor(flowering$Plant_Sex)
+  .[,-1] %>%
+  .[FlowerID!="" | !is.na(FlowerID)]
+flowering %<>% mutate_all(as.character)
+flowering[,c("Location","Genotype","Plant_Sex")] %<>% mutate_all(as.factor)
 flowering$Flowering_Date = anytime::anydate(as.character(flowering$Flowering_Date))
 colnames(flowering) = gsub("_"," ", names(flowering))
 
-seeds_data = list.files(patt="SeedsGerminatingAfter8Weeks.csv$", recursive = TRUE) %>%
-  lapply(fread) %>%
-  rbindlist(id=T, fill=T) %>%
-  .[,-1]
-seeds_data = seeds_data[complete.cases(seeds_data),]
-seeds_data$Location = as.factor(seeds_data$Location)
-if(nrow(seeds_data)>0){
-seeds_data$Germination_after_8_Weeks_Date = anytime::anydate(seeds_data$Germination_after_8_Weeks_Date)
-} else {
-  seeds_data$Germination_after_8_Weeks_Date = anytime::anydate(as.character(seeds_data$`Germination after 8 Weeks Date`))
-}
-colnames(seeds_data) = gsub("_"," ",names(seeds_data))
-
-status = list.files(patt="Status.csv$", recursive = TRUE) %>% # add location in script
+status = list.files(patt="PlantStatus.csv$", recursive = TRUE) %>% # add location in script
   lapply(fread) %>%
   rbindlist(id=T, fill=T) %>% .[,-1] 
 
+status %<>% mutate_all(as.character)
+
 status$Status_Date = anytime::anydate(as.character(status$Status_Date))
 colnames(status) = gsub("_"," ", names(status))
+if(nrow(status)>0){
 status$Image = paste0("<a href='",status$Image,"'>",'photo',"</a>")
-status = dplyr::select(status, Location, StatusID, `Status Date`,Status, everything())
+}
+status = dplyr::select(status, Location, StatusID, `Status Date`,Status, everything()) %>%
+  .[complete.cases(.),]
+
 
 contamination = list.files(patt="Contamination.csv$", recursive = TRUE) %>%
   lapply(fread) %>%
@@ -42,154 +39,118 @@ contamination = list.files(patt="Contamination.csv$", recursive = TRUE) %>%
 
 contamination$Location = as.factor(contamination$Location)
 contamination$Contamination_Date = anytime::anydate(as.character(contamination$Contamination_Date))
-colnames(contamination) = gsub("_"," ", names(contamination))
+colnames(contamination) =gsub("_"," ", names(contamination))
 
-plantlets = list.files(patt="Plantlets.csv$", recursive = TRUE) %>%
-  lapply(fread) %>%
-  rbindlist(id=T, fill = T) 
-
-plantlets$Subculture_Date = anytime::anydate(as.character(plantlets$Subculture_Date))
-plantlets$Date_of_Rooting = anytime::anydate(as.character(plantlets$Date_of_Rooting))
-plantlets$Location = as.factor(plantlets$Location)
-plantlets$Screenhouse_Transfer_Date = anytime::anydate(as.character(plantlets$Screenhouse_Transfer_Date))
-plantlets$Hardening_Date = anytime::anydate(as.character(plantlets$Hardening_Date))
-plantlets$Openfield_Transfer_Date = anytime::anydate(as.character(plantlets$Openfield_Transfer_Date))
-plantlets = plantlets %>% dplyr::select(Location, PlantletID, -c(".id","SeedID"), everything())
-colnames(plantlets) = gsub("_"," ", names(plantlets))
-
-if(nrow(plantlets)>0){
-
-  plantlets$Crossnumber = ifelse(bananadata$Crossnumber==substr(plantlets$PlantletID, 1, nchar(bananadata$Crossnumber)), bananadata$Crossnumber,"")
-  plantlets = Reduce(function(x,y) merge(x,y, by="Crossnumber"), list(bananadata[,c("Crossnumber","Mother","Father")], plantlets))
-}
-
+# crosses
 crosses = list.files(patt="BananaData.csv$", recursive = TRUE) %>%
   lapply(fread) %>%
   rbindlist(id=T, fill = T) %>% .[,-1]
-##******************************************************
+crosses %<>% mutate_all(as.character)
+crosses = dplyr::select(crosses, -c("Number_Sent_for_Embryo_Rescue","Early_Germination_Seeds"))
+#******************************************************
 crosses = setDT(crosses)[crosses[, .I[which.min(Reduce(`+`, lapply(.SD, is.na)))], Crossnumber]$V1]
-crosses$First_Pollination_Date = anytime::anydate(as.character(crosses$First_Pollination_Date))
+
 # previous records
 arusha_legacy_crosses = fread("data/Last_6_months_tisssue_culture_data.csv")
 rmcol = c("contamination","badseeds",grep("^days", names(arusha_legacy_crosses), value = T))
 arusha_legacy_crosses = arusha_legacy_crosses[, (rmcol) := NULL][] %>% # drop unwanted columns
   setnames(colnames(.), c("Location","Crossnumber","Mother","Father","First_Pollination_Date","Bunch_Harvest_Date", "Seed_Extraction_Date",
-                          "Total_Seeds","Good_Seeds","Number_of_Embryo_Rescued", "Embryo_Rescue_Date", "Germination_after_8_Weeks_Date",                  
-                          "Active_after_8_Weeks"))
-arusha_legacy_crosses$First_Pollination_Date = anytime::anydate(as.character(arusha_legacy_crosses$First_Pollination_Date))
-
+                          "Total_Seeds","Good_Seeds","Number_of_Embryo_Rescued", "Embryo_Rescue_Date", "Germination_Date",                  
+                          "Number_of_Embryo_Germinating"))
 # merge crosses and previous datasets
-banana = plyr::rbind.fill(crosses, arusha_legacy_crosses)
-#banana = rbindlist(sets, use.names = T,fill=T,idcol = NULL)
-banana$First_Pollination_Date = anytime::anydate(as.character(banana$First_Pollination_Date))
+banana =rbind.fill(crosses, arusha_legacy_crosses)
+banana_dates = grep("_Date", names(banana), value = T)
+banana[,banana_dates] %<>% mutate_all(anytime::anydate)
 
-banana$Bunch_Harvest_Date = anytime::anydate(as.character(banana$Bunch_Harvest_Date))
-banana$Seed_Extraction_Date = anytime::anydate(as.character(banana$Seed_Extraction_Date))
-banana$Embryo_Rescue_Date = anytime::anydate(as.character(banana$Embryo_Rescue_Date))
-banana$Germination_after_2_Weeks_Date = anytime::anydate(as.character(banana$Germination_after_2_Weeks_Date))
-banana$Germination_after_8_Weeks_Date = anytime::anydate(as.character(banana$Germination_after_8_Weeks_Date))
-
-banana$Days_to_Maturity = banana$Bunch_Harvest_Date - banana$First_Pollination_Date
-banana$Days_in_ripening_shed = banana$Seed_Extraction_Date - banana$Bunch_Harvest_Date
+banana$Days_to_Maturity = as.integer(banana$Bunch_Harvest_Date - banana$First_Pollination_Date)
+banana$Days_in_ripening_shed = as.integer(banana$Seed_Extraction_Date - banana$Bunch_Harvest_Date)
 
 
 # repeat pollination 
-repeatpollination = list.files(patt="RepeatPollination.csv$", recursive = TRUE) %>%
+repeatpollination = list.files(patt="RepeatPollination.csv", recursive = TRUE) %>%
   lapply(fread) %>%
-  rbindlist(id=T, fill=T) %>%
-  .[,-c(1,4)]
+  rbindlist(id=T, fill=T) %>% .[,-1]
+repeatpollination %<>% mutate_all(as.character)
 
-repeatDT = as.data.frame(repeatpollination[,number := 1:.N, by = Crossnumber])
-repeatDTwide = reshape(repeatDT,direction = "wide", idvar = "Crossnumber", timevar = "number")
-
-repeatDTwide[,2:ncol(repeatDTwide)] = lapply(repeatDTwide[,2:ncol(repeatDTwide)],anytime::anydate)
-repeats = setDT(repeatDTwide)[, Number_of_repeat_pollinations := rowSums(!is.na(repeatDTwide))-1][]
-bananadt = dplyr::left_join(banana, repeats, by="Crossnumber")
-  #Reduce(function(x,y)merge(x,y,by=c("Crossnumber")), list(banana,repeats))
-#bananadt$Location = as.factor(bananadt$Location)
-
-
-# select ID reported with status
-bananadt$StatusID = bananadt$Crossnumber
-lostInfo = dplyr::inner_join(bananadt, status, by=c("Location","StatusID"))
-lostInfo = janitor::remove_empty(lostInfo,"cols")
-cols.num <- grep("_Date", names(lostInfo), value = T)
-lostInfo[cols.num] <- sapply(lostInfo[cols.num],as.character)
-
-lostInfo = lostInfo %>% tidyr::gather(Last_activity_recorded, Activity_Date, contains("_Date"), na.rm=T)
-
-lostInfo = setDT(lostInfo)[,c("Location","Crossnumber","Last_activity_recorded","Activity_Date","Status","Notes","Image")][order(-Activity_Date)]
-lostInfo = lostInfo %>%
-  dplyr::filter(Last_activity_recorded !="Status_Date" & Activity_Date !="")
-
-lostInfo$Last_activity_recorded = gsub("_Date","", lostInfo$Last_activity_recorded)
-lostInfo$Last_activity_recorded = gsub("_"," ", lostInfo$Last_activity_recorded)
-
-lostInfo$Last_activity_recorded = ifelse(grepl("^Repeat Pollination.", lostInfo$Last_activity_recorded, perl = T)==TRUE,"Repeat Pollination",lostInfo$Last_activity_recorded)
-lostInfo = lostInfo[!duplicated(lostInfo$Crossnumber), ]
-colnames(lostInfo) = gsub("_"," ", names(lostInfo))
-
-status$Location = as.factor(status$Location)
-
-# drop IDs reported with status
-bananadata = dplyr::anti_join(bananadt, status, by="StatusID")
-bananadata$StatusID = NULL
-
+bananadata = banana
 ###################################
 bananadata$Mother = stringr::str_trim(bananadata$Mother, side = "both")
 bananadata$Father = stringr::str_trim(bananadata$Father, side = "both")
 bananadata$Father = gsub(" - ","-",bananadata$Father)
 
-bananadata$Mother = ifelse(bananadata$Mother %in% c("cv-Rose","ITC0712"),"ITC0712 Cv Rose", bananadata$Mother)
-bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC0609","Pahang","Pisang Pahang"),"ITC0609 Pahang", bananadata$Mother)
-bananadata$Mother = ifelse(bananadata$Mother %in% c("Calcutta 4","ITC0249"),"ITC0249 Calcutta 4", bananadata$Mother)
-bananadata$Mother = ifelse(bananadata$Mother %in% c("Borneo","ITC0253"),"ITC0253 Borneo", bananadata$Mother)
-bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC0766","Paliama"),"ITC0766 Paliama", bananadata$Mother)
-bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC1460","Ijihu nkundu"),"ITC1460-Ijihu nkundu", bananadata$Mother)
-bananadata$Mother = ifelse(bananadata$Mother %in% c("ITC1468","Kahuti"),"ITC1468-Kahuti", bananadata$Mother)
-
-bananadata$Father = ifelse(bananadata$Father %in% c("cv-Rose","ITC0712"),"ITC0712 Cv Rose", bananadata$Father)
-bananadata$Father = ifelse(bananadata$Father %in% c("ITC0609","Pahang","Pisang Pahang"),"ITC0609 Pahang", bananadata$Father)
-bananadata$Father = ifelse(bananadata$Father %in% c("Calcutta 4","ITC0249"),"ITC0249 Calcutta 4", bananadata$Father)
-bananadata$Father = ifelse(bananadata$Father %in% c("Borneo","ITC0253"),"ITC0253 Borneo", bananadata$Father)
-bananadata$Father = ifelse(bananadata$Father %in% c("ITC0766","Paliama"),"ITC0766 Paliama", bananadata$Father)
-bananadata$Father = ifelse(bananadata$Father %in% c("ITC1460","Ijihu nkundu"),"ITC1460-Ijihu nkundu", bananadata$Father)
-bananadata$Father = ifelse(bananadata$Father %in% c("ITC1468","Kahuti"),"ITC1468-Kahuti", bananadata$Father)
-
-# library(brapi)
-# mb = brapi::ba_db()$musabase
-# accessions = brapi::ba_germplasm_search(mb, rclass="data.frame") %>%
-#   dplyr::select(germplasmName,synonyms)
-# 
-# bananadata$Mother = ifelse(bananadata$Mother %in% accessions$synonyms, accessions$germplasmName, bananadata$Mother)
-# bananadata$Father = ifelse(bananadata$Father %in% accessions$synonyms, accessions$germplasmName, bananadata$Father)
+# format to Musabase format/ structure
+source("helpers/convert_names_to_musabase_format.R")
 
 #######################################
 bananadata = bananadata %>%
-  dplyr::select(Location, Crossnumber, FemalePlotName, Mother, MalePlotName, Father, First_Pollination_Date, Number_of_repeat_pollinations,
+  dplyr::select(Location, Crossnumber, FemalePlotName, Mother, MalePlotName, Father, First_Pollination_Date, # Number_of_Repeat_Pollinations,
                 Days_to_Maturity,Bunch_Harvest_Date, Days_in_ripening_shed, everything(), -c(Cycle,starts_with("Repeat_Pollination_Date.")))
 
-bananadata$Location = as.factor(bananadata$Location)
-bananadata$Mother = as.factor(bananadata$Mother)
-bananadata$Father = as.factor(bananadata$Father)
+bananadata[,c("Location","Mother","Father")] %<>% mutate_all(as.factor)
 
 # if duplicate germplasm names, keep rows with minimum missing
 bananadata = setDT(bananadata)[bananadata[, .I[which.min(Reduce(`+`, lapply(.SD, is.na)))], Crossnumber]$V1]
 colnames(bananadata) = gsub("_"," ", names(bananadata))
 
+# include ploidy information
+germplasmploidy = fread("data/germplasmploidy.csv")
+germplasmploidy$ploidylevel = toupper(germplasmploidy$ploidylevel)
+bananadata$germplasmName = as.character(bananadata$Mother)
+bananaploidy = dplyr::left_join(bananadata,germplasmploidy, by='germplasmName')
+bananaploidy = bananaploidy %>% dplyr::rename(FemalePloidyLevel = ploidylevel)
+
+bananaploidy$germplasmName = NULL
+bananaploidy$germplasmName = as.character(bananaploidy$Father)
+bananaploidy = dplyr::left_join(bananaploidy, germplasmploidy, by='germplasmName')
+bananadata = bananaploidy %>% dplyr::rename(MalePloidyLevel = ploidylevel)
+bananadata$germplasmName = NULL
+
+# Musabase Links of genotypes
+colnames(accessions_links_in_musabase) = c("Mother",'ML')
+bananadata = dplyr::left_join(bananadata, accessions_links_in_musabase, by="Mother")
+colnames(accessions_links_in_musabase) = c("Father",'FL')
+bananadata = dplyr::left_join(bananadata, accessions_links_in_musabase, by="Father")
+
+
+bananadata = bananadata %>% dplyr::select("Location","Crossnumber","FemalePlotName","Mother","ML","FemalePloidyLevel","MalePlotName","Father","FL","MalePloidyLevel", everything())
+bananadata = bananadata[!duplicated(bananadata$Crossnumber),]
+
+# Drop ID with wrong formats
+droprows = bananadata %>% dplyr::filter(substr(bananadata$Crossnumber,10,11)=="(C" | grepl("C/",bananadata$Crossnumber)==TRUE | grepl("/)",bananadata$Crossnumber[1]))
+bananadata = dplyr::anti_join(bananadata, droprows, by="Crossnumber")
+
+
+# Plantlets
+plantlets = list.files(patt="*Plantlets*", recursive = TRUE) %>%
+  lapply(fread) %>%
+  rbindlist(id=T, fill = T)
+
+plantlets %<>% mutate_if(is.logical, as.character)
+plantlets_dates = grep("Date$", names(plantlets), value = T)
+plantlets[,plantlets_dates] %<>% mutate_all(anytime::anydate)
+colnames(plantlets) = gsub("_"," ", names(plantlets))
+
+if(nrow(plantlets)>0){
+plants_Id = stringr::str_split_fixed(plantlets$PlantletID,"_",3)
+plantlets$Crossnumber = paste0(plants_Id[,1],"_",plants_Id[,2])
+plantlets = dplyr::left_join(plantlets, bananadata[,c("Crossnumber","Mother","Father")], by="Crossnumber")
+}
+
+plantlets = dplyr::select(plantlets, -c(".id","Embryo Rescue Date","Good Seeds","Number of Embryo Rescued", contains("Status")))
+
+plantlets = plantlets %>% dplyr::select(Location, PlantletID, everything()) %>% setDT()
 
 ##########################################################################################
 ## DATA EXPLORER
 ##########################################################################################
 
-
 if (nrow(flowering)>0){
-  flowered = flowering[,c("Location","Accession Name","Flowering Date")]
+  flowered = flowering[,c("Location","Genotype","Flowering Date")]
   flowered$Activity = "Flowering"
   colnames(flowered) <- c("Location","Accession","Date","Activity")
   flowered = flowered[complete.cases(flowered),]
 } else {
-  flowered = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
+  flowered = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
 }
 
 
@@ -200,19 +161,22 @@ if(nrow(bananadata)>0){
     first_pollinationed$Activity = "First pollination"
     first_pollinationed = first_pollinationed[complete.cases(first_pollinationed),]
  } else {
-   first_pollinationed = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
+   first_pollinationed = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
  }   
     
  # Repeat Polln
- if(nrow(repeatpollination)>0){
- repeat_pollinationed = repeatpollination[,-3] %>%
-   dplyr::arrange(.,Crossnumber,desc(Repeat_Pollination_Date)) 
- repeat_pollinationed = repeat_pollinationed[!duplicated(repeat_pollinationed$Crossnumber),]
- repeat_pollinationed = dplyr::left_join(repeat_pollinationed, bananadata[,c("Location","Crossnumber","Mother","Father")], by="Crossnumber")
- colnames(repeat_pollinationed) = c("Accession","Date","Location","Mother","Father")
- repeat_pollinationed$Date = anytime::anydate(repeat_pollinationed$Date)
- repeat_pollinationed $Activity = "Repeat pollination"
- }
+
+repeat_pollinationed = repeatpollination %>%
+ dplyr::arrange(.,Crossnumber,desc(Repeat_Pollination_Date)) 
+repeat_pollinationed = repeat_pollinationed[!duplicated(repeat_pollinationed$Crossnumber),]
+repeat_pollinationed = dplyr::left_join(repeat_pollinationed, bananadata[,c("Crossnumber","Mother","Father")], by="Crossnumber")
+colnames(repeat_pollinationed) = c("Location","Accession","Date","Mother","Father")
+repeat_pollinationed$Date = anytime::anydate(repeat_pollinationed$Date)
+if(nrow(repeat_pollinationed)>0){
+ repeat_pollinationed$Activity = "Repeat pollination"
+} else {
+  repeat_pollinationed$Activity = character()
+}
     
 # Harvest
 harvested = bananadata[,c("Location", "Crossnumber", "Mother","Father","Bunch Harvest Date")]
@@ -223,171 +187,111 @@ if(nrow(harvested)>0){
 harvested = harvested[complete.cases(harvested),]
 
 # Extracted
-extracted = bananadata[, c("Location","Crossnumber","Mother","Father","Seed Extraction Date")]
-colnames(extracted) <- c("Location","Accession","Mother","Father","Date")
+extracted = bananadata[, c("Location","Crossnumber","Mother","Father","Seed Extraction Date","Total Seeds")]
+colnames(extracted)[c(1:6)] <- c("Location","Accession","Mother","Father","Date","Total Seeds")
 if(nrow(extracted)>0){
   extracted$Activity = "Seed extraction"
 }
 extracted = extracted[complete.cases(extracted),]
 
 # Rescue
-rescued = bananadata[,c("Location","Crossnumber","Mother","Father","Embryo Rescue Date")]
-colnames(rescued) <- c("Location","Accession","Mother","Father","Date")
+rescued = bananadata[,c("Location","Crossnumber","Mother","Father","Embryo Rescue Date","Total Seeds","Good Seeds","Number of Embryo Rescued")]
+colnames(rescued) <- c("Location","Accession","Mother","Father","Date","Total Seeds","Good Seeds","Number of Embryo Rescued")
 if(nrow(rescued)>0){
   rescued$Activity = "Embryo Rescue"
 }
 #rescued$Date = lubridate::dmy(rescued$Date)
 rescued = rescued[complete.cases(rescued),]
 
-# Germinated after 2wks
-germinated_2weeks = bananadata[,c("Location","Crossnumber","Mother","Father","Germination after 2 Weeks Date")]
-colnames(germinated_2weeks) <- c("Location","Accession","Mother","Father","Date")
-if(nrow(germinated_2weeks)>0){
-  germinated_2weeks$Activity = "Germination after 2 weeks"
+# Germination
+germinated = bananadata[,c("Location","Crossnumber","Mother","Father","Germination Date","Total Seeds","Good Seeds","Number of Embryo Rescued","Number of Embryo Germinating")]
+colnames(germinated) <- c("Location","Accession","Mother","Father","Date","Total Seeds","Good Seeds","Number of Embryo Rescued","Number of Embryo Germinating")
+if(nrow(germinated)>0){
+  germinated$Activity = "Germination"
 }
-#germinated_2weeks$Date = anytime::anydate(as.character(germinated_2weeks$Date))
-germinated_2weeks = germinated_2weeks[complete.cases(germinated_2weeks),]
+germinated = germinated[complete.cases(germinated),]
 
-# Germinated after 8weeks
-germinated_8weeks = bananadata[,c("Location","Crossnumber","Mother","Father","Germination after 8 Weeks Date")]
-colnames(germinated_8weeks) <- c("Location","Accession","Mother","Father","Date")
-if(nrow(germinated_8weeks)>0){
-  germinated_8weeks$Activity = "Germination after 8 weeks"
-}
-germinated_8weeks = germinated_8weeks[complete.cases(germinated_8weeks),]
-#} # end if
 
-# Seeds germinating after 8weeks
-#if(nrow(seeds_data)>0){
-  germinating_seeds = seeds_data
-   germinating_seeds$Activity = "Seeds germinating after 8 weeks"
-   germinating_seeds = germinating_seeds[complete.cases(germinating_seeds),]
-# }
 
 # Subculture
 if(nrow(plantlets)>0){
-   subcul = plantlets[,c("Location","PlantletID","Mother","Father","Subculture Date")]
-   colnames(subcul) <- c("Location","Accession","Mother","Father","Date")
+   subcul = plantlets[,c("Location","PlantletID","Mother","Father","Subculture Date","Copies")]
+   colnames(subcul) <- c("Location","Accession","Mother","Father","Date", "Copies")
    subcul$Date = anytime::anydate(as.character(subcul$Date))
    if(nrow(subcul)>0){
-     subcul$Activity = "Sub-culturing"
+     subcul$Activity = "Subculturing"
    }
    subcul = subcul[complete.cases(subcul),]
 } else{
-  subcul = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
+  subcul = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date= anytime::anydate(integer(0)), Copies=character())
 }   
   # # Rooted
 if(nrow(plantlets)>0){   
-   rooted = plantlets[,c("Location","PlantletID","Mother","Father","Date of Rooting")]
-   colnames(rooted) <- c("Location","Accession","Mother","Father","Date")
+   rooted = plantlets[,c("Location","PlantletID","Mother","Father","Date of Rooting","Copies","Number Rooting")]
+   colnames(rooted) <- c("Location","Accession","Mother","Father","Date","Copies","Number Rooting")
    if(nrow(rooted)>0){
      rooted$Activity = "Rooting"
    }
    rooted = rooted[complete.cases(rooted),]
 } else{
-  rooted = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
-}    
-   # Screenhse
+  rooted = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
+} 
+if(nrow(plantlets)>0){   
+  weaning1 = plantlets[,c("Location","PlantletID","Mother","Father","Sending Out Date","Copies","Number Rooting", "Number Sent Out")]
+  colnames(weaning1) <- c("Location","Accession","Mother","Father","Date","Copies","Number Rooting", "Number Sent Out")
+  if(nrow(weaning1)>0){
+    weaning1$Activity = "Weaning 1/ Sent out"
+  }
+  weaning1 = weaning1[complete.cases(weaning1),]
+} else{
+  weaning1 = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
+} 
+if(nrow(plantlets)>0){   
+  weaning2 = plantlets[,c("Location","PlantletID","Mother","Father","Weaning 2 Date","Copies","Number Rooting", "Number Sent Out", "Weaning 2 Plantlets")]
+  colnames(weaning2) <- c("Location","Accession","Mother","Father","Date","Copies","Number Rooting", "Number Sent Out", "Number in Weaning2")
+  if(nrow(weaning2)>0){
+    weaning2$Activity = "Weaning 2"
+  }
+  weaning2 = weaning2[complete.cases(weaning2),]
+} else{
+  weaning2 = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
+} 
+
+# Screenhse
 if(nrow(plantlets)>0){      
-   screen_housed = plantlets[,c("Location","PlantletID","Mother","Father","Screenhouse Transfer Date")]
-   colnames(screen_housed) <- c("Location","Accession","Mother","Father","Date")
+   screen_housed = plantlets[,c("Location","PlantletID","Mother","Father","Screenhouse Transfer Date","Copies","Number Rooting", "Number Sent Out", "Weaning 2 Plantlets", "Number in Screenhouse" )]
+   colnames(screen_housed) <- c("Location","Accession","Mother","Father","Date","Copies","Number Rooting", "Number Sent Out", "Number in Weaning2", "Number in Screenhouse")
    if(nrow(screen_housed)>0){
      screen_housed$Activity = "Screen house"
    }
    screen_housed = screen_housed[complete.cases(screen_housed),]
 } else {
-  screen_housed = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
+  screen_housed = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
 }    
    # Hardened
 if(nrow(plantlets)>0){    
-   hardened = plantlets[,c("Location","PlantletID","Mother","Father","Hardening Date")]
-   colnames(hardened) <- c("Location","Accession","Mother","Father","Date")
+   hardened = plantlets[,c("Location","PlantletID","Mother","Father","Hardening Date","Copies","Number Rooting", "Number Sent Out", "Weaning 2 Plantlets", "Number in Screenhouse" ,"Number in Hardening")]
+   colnames(hardened) <- c("Location","Accession","Mother","Father","Date","Copies","Number Rooting", "Number Sent Out", "Number in Weaning2", "Number in Screenhouse" ,"Number Hardening")
    if(nrow(hardened)>0){
      hardened$Activity = "Hardening"
    }
    hardened = hardened[complete.cases(hardened),]
  } else {
-   hardened = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
+   hardened = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
  }    
    # Openfield
 if(nrow(plantlets)>0){    
-   open_field = plantlets[,c("Location","PlantletID","Mother","Father","Openfield Transfer Date")]
-   colnames(open_field) <- c("Location","Accession","Mother","Father","Date")
+   open_field = plantlets[,c("Location","PlantletID","Mother","Father","Openfield Transfer Date","Copies","Number Rooting", "Number Sent Out", "Weaning 2 Plantlets", "Number in Screenhouse" ,"Number in Hardening", "Number in Openfield")]
+   colnames(open_field) <- c("Location","Accession","Mother","Father","Date","Copies","Number Rooting", "Number Sent Out", "Number in Weaning2", "Number in Screenhouse" ,"Number Hardening", "Number in Openfield")
    if(nrow(open_field)>0){
      open_field$Activity = "Open field"
    }
    open_field = open_field[complete.cases(open_field),]
  } else {
-   open_field = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),anytime::anydate(integer(0)))
+   open_field = data.frame(Location = character(), Accession = character(),Mother = character(),Father = character(),Date = anytime::anydate(integer(0)))
  } 
 
-cleantable = plyr::rbind.fill(flowered,first_pollinationed,repeat_pollinationed,
-                              harvested,extracted,rescued,germinated_2weeks,germinated_8weeks)
-
-#rooted,subcul, screen_housed,hardened,open_field,statusD)
-# cleantable = cleantable %>%
-#   dplyr::filter_at(.vars = vars(Location, Accession), .vars_predicate = any_vars(!is.na(.)))
-# 
-# # Aggregate by uniqueness of parents
-# number_of_crosses=na.omit(plyr::count(bananadata, c("Location", "Mother","Father")))
-# colnames(number_of_crosses) = c("Location", "Mother","Father","Number of Crosses")
-# number_of_seeds = setDT(bananadata[,c("Location","Mother","Father","Total Seeds")])
-# number_of_seeds = number_of_seeds[, .(`Total Seeds Extracted`=sum(as.integer(`Total Seeds`))), by = c("Location","Mother","Father")]
-# 
-# number_of_embryo = setDT(bananadata[,c("Location","Mother","Father","Number of Embryo Rescued")])
-# number_of_embryo = number_of_embryo[,.(`Number of Embryo Rescued`=sum(as.integer(`Number of Embryo Rescued`))), by = c("Location","Mother","Father")]
-# 
-# number_of_active8weeks = setDT(bananadata[,c("Location","Mother","Father","Actively germinating after 8 Weeks")])
-# number_of_active8weeks = number_of_active8weeks[,.(`Number of Embryo Germinating after 8 Weeks`=sum(as.integer(`Actively germinating after 8 Weeks`))), by = c("Location","Mother","Father")]
-# 
-# n_subcultures = setDT(plantlets[,c("Location","Mother","Father",'Subculture Date')])
-# n_subcultures = n_subcultures[complete.cases(n_subcultures),]
-# subcultures_combined = na.omit(plyr::count(n_subcultures, c("Location","Mother","Father")))
-# colnames(subcultures_combined) = c("Location","Mother","Father","Number of Subcultures")
-# subcultures_combined$'Number of Subcultures' = as.integer(subcultures_combined$'Number of Subcultures')
-# 
-# n_rooting = setDT(plantlets[,c("Location", "Mother","Father",'Date Rooting')])
-# n_rooting = n_rooting[complete.cases(n_rooting),]
-# rooting_combined = na.omit(plyr::count(n_rooting, c("Location","Mother","Father")))
-# colnames(rooting_combined) = c("Location","Mother","Father","Number of Rooting Plantlets")
-# rooting_combined$'Number of Rooting Plantlets' = as.integer(rooting_combined$'Number of Rooting Plantlets')
-# 
-# n_screenhouse = setDT(plantlets[,c("Location", "Mother","Father",'Screenhouse Transfer Date')])
-# n_screenhouse = n_screenhouse[complete.cases(n_screenhouse),]
-# screenhouse_combined = na.omit(plyr::count(n_subcultures, c("Location","Mother","Father")))
-# colnames(screenhouse_combined) = c("Location","Mother","Father","Number of Plantlets Transferred to Screenhouse")
-# screenhouse_combined$'Number of Plantlets Transferred to Screenhouse' = as.integer(screenhouse_combined$'Number of Plantlets Transferred to Screenhouse')
-# 
-# n_hardening = setDT(plantlets[,c("Location","Mother","Father",'Hardening Date')])
-# n_hardening = n_hardening[complete.cases(n_hardening),]
-# hardening_combined = na.omit(plyr::count(n_hardening, c("Location","Mother","Father")))
-# colnames(hardening_combined) = c("Location","Mother","Father","NUmber of Plantlets Hardened")
-# hardening_combined$'NUmber of Plantlets Hardened' = as.integer(hardening_combined$'NUmber of Plantlets Hardened')
-# 
-# n_openfield = setDT(plantlets[,c("Location", "Mother","Father",'Openfield Transfer Date')])
-# n_hardening = n_hardening[complete.cases(n_hardening),]
-# openfield_combined = na.omit(plyr::count(n_openfield, c("Location","Mother","Father")))
-# colnames(openfield_combined) = c("Location","Mother","Father","Number of Plantlets in Openfield")
-# openfield_combined$'Number of Plantlets in Openfield' = as.integer(openfield_combined$'Number of Plantlets in Openfield')
-# 
-# all_plants = list(number_of_crosses, number_of_seeds,number_of_embryo,
-#                   number_of_active8weeks, subcultures_combined, rooting_combined, screenhouse_combined, hardening_combined, openfield_combined)
-# overall_plants = Reduce(function(x,y) merge(x,y, all = T, by = c("Location","Mother","Father")), all_plants)
-# 
-# # overall_plants = left_join(number_of_crosses, summary_crosses,by = c("Location","Mother","Father"))
-# # overall_plants = left_join(overall_plants ,subcultures_combined, by = c("Location","Mother","Father"))
-# # overall_plants = left_join(overall_plants,rooting_combined,by = c("Location","Mother","Father"))
-# # overall_plants = left_join(overall_plants,screenhouse_combined,by = c("Location","Mother","Father")) 
-# # overall_plants = left_join(overall_plants,hardening_combined,by = c("Location","Mother","Father")) 
-# # overall_plants = left_join(overall_plants,openfield_combined,by = c("Location","Mother","Father"))
-# #                       
-# overall_plants = unique(overall_plants)
-# #overall_plants = na.omit(overall_plants, cols = c("Mother","Father"))
-
-
-
-
-
-
-
+cleantable = plyr::rbind.fill(flowered,first_pollinationed,repeat_pollinationed,harvested,extracted,rescued,germinated,
+                              subcul, rooted,weaning1, weaning2,screen_housed,hardened, open_field)
+cleantable$Date = anytime::anydate(as.character(cleantable$Date))
 

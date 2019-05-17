@@ -1,40 +1,38 @@
 
 source("loaddata.R")
-source("tc_load.R") # tissue culture data
+source("tcload.R") # tissue culture data
+
+enableBookmarking(store = "url")
 
 datevalue = c(min(anytime::anydate(cleantable$Date)),max(anytime::anydate(cleantable$Date)))
-datemin = min(lubridate::ymd(cleantable$Date))
-datemax = max(lubridate::ymd(cleantable$Date))
+datemin = min(lubridate::ymd(na.omit(cleantable$Date)))
+datemax = max(lubridate::ymd(na.omit(cleantable$Date)))
 
 
 # searchbar
 aa = setorder(cleantable,Accession, -Date)
 bb = aa[!duplicated(aa$Accession),]
 
-Allset = setDT(bananadata)[,c("Crossnumber","Total Seeds","Good Seeds","Number of Embryo Rescued","Active after 8 Weeks")]
-colnames(Allset)[1] = "Accession"
-merge_bb = Reduce(function(x,y) merge(x,y, all=T, by = "Accession"), list(bb, Allset))
-merge_bb = merge_bb[!duplicated(merge_bb$Accession),]
-bb_flower = setDT(merge_bb)[Activity=='Flowering' & Date >= Sys.Date()-7]
-
-
-bb_other = merge_bb["Activity" !='Flowering'] #, Activity != 'Seed extraction' & Activity != 'Embryo rescue' & Activity != 'Germination after 8 weeks')
-bbDF <- rbind(bb_other, bb_flower) #, bb_seedExtr, bb_rescue, bb_8weeks)
+bb_flower = setDT(bb)[Activity=='Flowering' & Date >= Sys.Date()-7]
+bb_other = bb["Activity" !='Flowering'] 
+bbDF <- rbind(bb_other, bb_flower)
 
 bbDF_order = "Location"
-bbDF = setcolorder(bbDF, c(bbDF_order, setdiff(names(bbDF),bbDF_order)))
-f_banana = bananadata %>%
-  dplyr::select(-c(Location, Mother,Father,FemalePlotName, MalePlotName)) %>%
-  dplyr::rename(Accession = Crossnumber)
 
-full_cleantable = dplyr::left_join(cleantable, f_banana, by="Accession") %>%
-  dplyr::select(-c(Mother,Father,ends_with("Date")),Date)
-  
-# full_cleantable
-#   filter(merge_bb, Activity=='Seed extraction')# & as.integer(`Total Seeds`) > 0
-# bb_rescue = filter(merge_bb, Activity == 'Embryo rescue') # &  as.integer(`Number of Embryo Rescued`) > 0
-# bb_8weeks = filter(merge_bb, Activity == 'Germination after 8 weeks')# & as.integer('Actively germinating after 8 weeks') > 0
 
+appCSS <- "
+#loading-content {
+position: absolute;
+background: #000000;
+opacity: 0.9;
+z-index: 100;
+left: 0;
+right: 0;
+height: 100%;
+text-align: center;
+color: #FFFFFF;
+}
+"
 
 searchlist = c(as.character(unique(na.omit(bb$Location))), 
                as.character(unique(na.omit(bb$Activity))), 

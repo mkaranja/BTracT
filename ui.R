@@ -9,49 +9,92 @@
 library(shiny)
 library(shinydashboard)
 library(shinysky)
+library(shinyjs)
+library(rmarkdown)
+library(shinycssloaders)
 
 source("ui_files/data_page.R")
 source("ui_files/overview_page.R")
 source("ui_files/status_page.R")
 source("ui_files/front_page.R")
 source("ui_files/about_page.R")
+source("ui_files/labels_page.R")
+source("ui_files/docs_page.R")
 
-# Define UI for application
 
-navbarPageWithSearchBox <- function(...,menu, inputs) {
+navbarPageWithSearchBox <- function(..., menu, refresh) {
+  
   navbar <- navbarPage(...)
-  form <- tags$form(class = "navbar-form; navbar-right",br(), inputs)
+  butt <- tags$form(class = "navbar-form; navbar-left",br(), refresh)
+  #log <- tags$form(class = "navbar-form; navbar-right",br(), log0ut)
+  #form <- tags$form(class = "navbar-form; navbar-right",br(), inputs)
+  
+  # navbar[[3]][[1]]$children[[1]] <- htmltools::tagAppendChild(
+  #   navbar[[3]][[1]]$children[[1]], log)
   navbar[[3]][[1]]$children[[1]] <- htmltools::tagAppendChild(
-    navbar[[3]][[1]]$children[[1]], form)
+    navbar[[3]][[1]]$children[[1]], butt)
+  # navbar[[3]][[1]]$children[[1]] <- htmltools::tagAppendChild(
+  #   navbar[[3]][[1]]$children[[1]], form)
+  
+  
+  
   navbar
 }
 
 shinyUI(
-  navbarPageWithSearchBox("", position = "fixed-top", theme = shinythemes::shinytheme("readable"),
   
-  tabPanel("BTracT",
-           frontpage()
-           ),
-  tabPanel("Overview",
-           br(),br(),br(),
-           includeCSS("www/AdminLTE.css"), # for activating shinydashboard/plus widgets
-            overviewPage()
-           ),
-  tabPanel("Data",
-           br(),br(),br(),
-           dataPage()
-           ),
-  tabPanel("Status",
-           br(),br(),br(),
-           statuspage()
-           ),
-  tabPanel("About",
-           br(),br(),br(),
-           helppage()
-           ),
-  inputs = div(shinysky::textInput.typeahead(id="search", placeholder="", local = data.frame(name=searchlist), valueKey = "name", tokens=c(1:length(searchlist)),
-                                             template = HTML("<h6 class='repo-name'>{{name}}</h6>")), 
-               actionBttn("go_search",label = "Go",style = "gradient", size = "sm")
-    )
+ navbarPageWithSearchBox("",id = "inTabset", theme = shinythemes::shinytheme("readable"), position='fixed-top',
+                         
+        tabPanel("BTracT",
+                 frontpage()
+                 ),
+        tabPanel("Overview",
+                br(),br(),br(),
+                 includeCSS("www/AdminLTE.css"), # for activating shinydashboard/plus widgets
+                  overviewPage()
+                 ),
+        tabPanel("Data",
+                br(),br(),br(),br(),br(),
+                 dataPage()
+                 ),
+        tabPanel("Status",
+                br(),br(),br(),br(),br(),
+                 statuspage()
+                 ),
+        navbarMenu("About",
+                   tabPanel("TC Label Management",
+                            br(),br(),br(),br(),br(),
+                            tc_page()),
+                   
+                   tabPanel("Download barcodes",
+                            br(),br(),br(),br(),
+                            labels()
+                   ),
+                   tabPanel("Docs",
+                            br(),br(),br(),br(),
+                            docs()
+                            )#,
+                   # tabPanel(
+                   #          a("Using BTracT", href="docs/usingbtract.html", target="_blank", icon=icon("note"))
+                   #          
+                   # )
+                 ),
+        
+        # log0ut = div(
+        #   actionBttn("logout", size="sm", style="jelly", color="success",label = "", block = T,
+        #              icon=icon("sign-out-alt", lib = "font-awesome"))
+        # ),
+         # inputs = div(
+         #    shinysky::textInput.typeahead(id="search", placeholder="search", 
+         #                                 local = data.frame(name=searchlist), 
+         #                                 valueKey = "name", 
+         #                                 tokens=c(1:length(searchlist)),
+         #                                 template = HTML("<p class='repo-name'>{{name}}</p>")), 
+         #              actionBttn("go_search",label = "", icon = icon("search"), color="primary", style = "material-circle", size = "xs", block = T,)
+         # ),
+        refresh = div( #style='padding:4px; width:1500%; font-size:150%')
+              actionBttn("refresh", size="xs", style="pill", color="danger",label = "",
+                               icon=icon("refresh", lib = "font-awesome"))
+          )
   )
 )
