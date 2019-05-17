@@ -1,6 +1,4 @@
 
-library(qrencoder)
-
 labels <- function(env_serv) with(env_serv, local({
   
   # only today's data should be displayed

@@ -1,13 +1,4 @@
-library(shiny)
-library(magrittr)
-library(collapsibleTree)
-library(data.table)
-library(shinyWidgets)
-require(treemap)
-require(dplyr)
-require(gridBase)
-require(RColorBrewer)
-require(plotly)
+
 
 source("helpers/scheduler.R")
 ### Handle cliks on a treemap

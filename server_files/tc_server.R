@@ -1,7 +1,4 @@
-library(WriteXLS)
-library(dplyr)
-library(DT)
-library(bsplus)
+
 # source("ui_files/tc_page.R")
 
 tc_server <- function(env_serv) with(env_serv, local({

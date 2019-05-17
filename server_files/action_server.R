@@ -1,10 +1,3 @@
-require(treemap)
-require(dplyr)
-require(shiny)
-require(gridBase)
-require(RColorBrewer)
-require(plotly)
-
 
 ### Handle cliks on a treemap
 tmLocate <-

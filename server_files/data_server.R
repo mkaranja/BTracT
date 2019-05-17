@@ -1,8 +1,3 @@
-library(shinyWidgets)
-library(summarytools)
-library(jsonlite)
-library(shinyjs)
-library(rpivotTable)
 
 css <- "
 #large .selectize-input { line-height: 40px; }
@@ -17,7 +12,6 @@ dataserver <- function(env_serv) with(env_serv, local({
       conditionalPanel(
         condition = "input.datatabs=='Data Table' || input.datatabs=='Structure'",
         selectInput("dataset","Select dataset:", c("Flowering","Crosses","Plantlets","Status","Contamination"), selected = 'Crosses'),
-        verbatimTextOutput('text'),
         conditionalPanel(
           condition = "input.datatabs=='Structure'",
           shinyWidgets::prettyRadioButtons(inputId = "display",label = "Display:", choices = c("str", "summary"),
@@ -165,13 +159,6 @@ dataserver <- function(env_serv) with(env_serv, local({
                                  searchHighlight=T, stateSave = TRUE))
   })
   
-  output$text <- renderPrint({
-    input$viewdt_cell_clicked$value
-  })
-  
-  
- 
-    
   
   downloadView <- reactive({
     result = viewInput()

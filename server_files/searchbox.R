@@ -1,7 +1,3 @@
-library(shinyBS)
-library(DT)
-library(data.table)
-
 
 searchbox <- function(env_serv) with(env_serv, local({
   

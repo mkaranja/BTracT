@@ -8,9 +8,7 @@ library(data.table)
 library(ggplot2)
 library(highcharter)
 library(lubridate)
-library(ECharts2Shiny)
-library(brapi)
-library(shinycssloaders)
+
 
 overviewserver <- function(env_serv) with(env_serv, local({
 

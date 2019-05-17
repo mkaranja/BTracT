@@ -1,9 +1,4 @@
 
-library(shinyWidgets)
-library(shinyFeedback)
-
-
-
 feedbackserver <- function(env_serv) with(env_serv, local({
   
   # FEEDBACK TAB
