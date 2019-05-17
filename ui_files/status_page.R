@@ -15,14 +15,17 @@ statuspage <- function()tagList(
                   div(
                     uiOutput('currentTitle'),
                              
-                    highchartOutput("current_Activities", height = "400px")), br(),br(),
+                    highchartOutput("current_Activities", height = "400px") %>% withSpinner(color="#0dc5c1")), br(),br(),
                            
                   box(width = 12, status = "primary", fill = T, tags$p(style = "color: #FF8C00; font-size: 20px; text-align: center;", "Expanded accession details"),
                       column(12, offset = 11,
                       downloadBttn("download_current_details", size = "xs")),
-                                       DT::dataTableOutput("current_Table")#), br()
+                                       DT::dataTableOutput("current_Table")
                   )
          ),
+         tabPanel('Scheduler',
+                  uiOutput('schedulerOut')
+                  ),
          
          tabPanel("Data flow",
                   fluidRow(
@@ -40,16 +43,16 @@ statuspage <- function()tagList(
                         )
                       )
                     )
-                  ),
-         tabPanel("Lost information",
-                  fluidRow(br(),
-                    tags$p(style = "color: #FF8C00; font-size: 18px; text-align: center;",
-                           "This page shows the accessions which have being dropped from tracking as a result reports of status or contaminations"), br(),
-                    column(12,offset = 11, 
-                           downloadBttn("downloadLost", size = "xs")), br(),
-                    DT::dataTableOutput("lostTbl"), br()
                   )
-              )
+         # tabPanel("Lost information",
+         #          fluidRow(br(),
+         #            tags$p(style = "color: #FF8C00; font-size: 18px; text-align: center;",
+         #                   "This page shows the accessions which have being dropped from tracking as a result reports of status or contaminations"), br(),
+         #            column(12,offset = 11, 
+         #                   downloadBttn("downloadLost", size = "xs")), br(),
+         #            DT::dataTableOutput("lostTbl"), br()
+         #          )
+         #      )
        )
     )
   )

@@ -80,11 +80,15 @@ feedback = function() tagList(
                tags$p(style = "color: orange; font-size: 24px; text-align: center;",
                       "Leave your feedback or suggestion here"),
                useShinyFeedback(), 
-               textInput("Name", labelMandatory("Your name"),width = '100%', placeholder = "Full Name"),
-               textInput("Email", labelMandatory("Your email"),width = '100%', placeholder = "Email address"),
-               textInput("Organization", labelMandatory("Organization"),width = '100%', placeholder = "Company"),
-               textAreaInput("Message", "Message/ comment", width = '600px', height = '150px', resize = "both", placeholder = "Message"),
-               actionBttn("submit", "Submit"),
+               column(6,
+                 textInput("Name", labelMandatory("Your name"),width = '100%', placeholder = "Full Name"),
+                 textInput("Email", labelMandatory("Your email"),width = '100%', placeholder = "Email address"),
+                 textInput("Organization", labelMandatory("Organization"),width = '100%', placeholder = "Company")
+                 ),
+               column(6,
+                 textAreaInput("Message", "Message/ comment", width = '600px', height = '250px', resize = "both", placeholder = "Message")
+                 ),
+               actionBttn("submit", "Submit", style = "material-flat", size = "sm"),
                
                
                shinyjs::hidden(
