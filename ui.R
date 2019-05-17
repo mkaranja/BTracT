@@ -6,12 +6,7 @@
 # 
 #    http://shiny.rstudio.com/
 #
-library(shiny)
-library(shinydashboard)
-library(shinysky)
-library(shinyjs)
-library(rmarkdown)
-library(shinycssloaders)
+
 
 source("ui_files/data_page.R")
 source("ui_files/overview_page.R")

@@ -1,4 +1,15 @@
 
+# Check if multiple R packages are installed. Install them if they are not,then load them into the R session.
+
+if(!require(pacman))install.packages("pacman")
+pacman::p_load("shiny", "shinydashboard", "shinydashboardPlus",
+               "shinysky", "shinyWidgets", "shinycssloaders", "shinyalert", "shinyFeedback", "shinyFeedback", "bsplus", "shinyBS",
+               "jsonlite","shinyjs",
+               "DT","summarytools","rpivotTable","qrencoder",
+               "plotly","highcharter", "collapsibleTree", "ECharts2Shiny", "r2d3", "gridBase", "RColorBrewer",
+               "rmarkdown",
+               "magrittr", "dplyr", "brapi", "WriteXLS")
+
 source("loaddata.R")
 source("tcload.R") # tissue culture data
 
