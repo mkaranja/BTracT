@@ -1,8 +1,4 @@
 
-library(magrittr)
-library(data.table)
-library(plyr); library(dplyr)
-
 #source('accessions_links_in_musabase.R')
 accessions_links_in_musabase = fread('data/accessions_links_in_musabase.csv')
 

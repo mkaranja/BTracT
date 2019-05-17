@@ -7,13 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
-library(shinyjs)
-library(shinycssloaders)
-library(shinyURL)
-library(slickR)
-library(knitr)
-
 source("server_files/overview_server.R")
 source("server_files/data_server.R")
 source("server_files/status_server.R")

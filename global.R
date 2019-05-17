@@ -8,7 +8,8 @@ pacman::p_load("shiny", "shinydashboard", "shinydashboardPlus",
                "DT","summarytools","rpivotTable","qrencoder",
                "plotly","highcharter", "collapsibleTree", "ECharts2Shiny", "r2d3", "gridBase", "RColorBrewer",
                "rmarkdown",
-               "magrittr", "dplyr", "brapi", "WriteXLS")
+               "magrittr","plyr", "dplyr", "brapi", "WriteXLS","dataframes2xls","stringr")
+
 
 source("loaddata.R")
 source("tcload.R") # tissue culture data

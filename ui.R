@@ -7,7 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 
-
 source("ui_files/data_page.R")
 source("ui_files/overview_page.R")
 source("ui_files/status_page.R")

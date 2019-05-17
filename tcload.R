@@ -1,7 +1,3 @@
-library(dplyr)
-library(dataframes2xls)
-library(stringr)
-
 
 if(nrow(bananadata)>0){
 banana_labels = bananadata %>%
