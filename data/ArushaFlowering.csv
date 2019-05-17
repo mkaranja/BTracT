@@ -1,9 +1,7 @@
-Location,FlowerID,Accession_Name,Plant_Sex,Flowering_Date
-Arusha,16NM_Huti-white_plot273r13c21,Huti-white,female,2019-02-14
-Arusha,16NM_Huti-white_plot104r5c20,Huti-white,female,2019-02-15
-Arusha,16NM_Huti-white_plot630r30c1,Huti-white,female,2019-02-14
-Arusha,16NM_Huti-white_plot716r35c2,Huti-white,female,2019-02-13
-Arusha,16NM_ITC1468-Kahuti_plot105_r5c21,ITC1468,female,2019-02-15
-Arusha,16NM_Huti-white_plot62r3c20,Huti-white,female,2019-02-14
-Arusha,16NM_Huti-white_plot146_r7c20,Huti-white,female,2019-02-15
-Arusha,16NM_ITC1468-Kahuti_plot69_r4c16,ITC1468,female,2019-02-13
+Location,FlowerID,Genotype,Plant_Sex,Flowering_Date
+Arusha,16NM_Huti-white_plot567r27c21,Huti-white,female,2019-05-13
+Arusha,16NM_Huti-white_plot120_r6c7,Huti-white,female,2019-05-07
+Arusha,16NM_Huti-white_plot339r17c3,Huti-white,female,2019-05-08
+Arusha,16NM_Huti-white_plot169r9c1,Huti-white,female,2019-05-10
+Arusha,16NM_Huti-white_plot629r30c2,Huti-white,female,2019-05-13
+Arusha,16NM_ITC1468-Kahuti_plot61_r3c19,ITC1468,female,2019-05-13
