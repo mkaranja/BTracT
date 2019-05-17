@@ -94,14 +94,14 @@ isAdmin <- reactive({
 })    
 
 # Show the feedback in the admin table
-observeEvent(input$feedback, {
-  showModal(modalDialog(
-    feedback(),
-    size = "l",
-    easyClose = TRUE,
-    footer = NULL
-  ))
-})
+# observeEvent(input$feedback, {
+#   showModal(modalDialog(
+#     feedback(),
+#     size = "l",
+#     easyClose = TRUE,
+#     footer = NULL
+#   ))
+# })
 
 
 

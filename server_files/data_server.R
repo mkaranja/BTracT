@@ -2,117 +2,195 @@ library(shinyWidgets)
 library(summarytools)
 library(jsonlite)
 library(shinyjs)
+library(rpivotTable)
+
+css <- "
+#large .selectize-input { line-height: 40px; }
+#large .selectize-dropdown { line-height: 30px; }"
 
 dataserver <- function(env_serv) with(env_serv, local({
   
+  
+  
+  output$sidebarControls <- renderUI({
+    div(
+      conditionalPanel(
+        condition = "input.datatabs=='Data Table' || input.datatabs=='Structure'",
+        selectInput("dataset","Select dataset:", c("Flowering","Crosses","Plantlets","Status","Contamination"), selected = 'Crosses'),
+        verbatimTextOutput('text'),
+        conditionalPanel(
+          condition = "input.datatabs=='Structure'",
+          shinyWidgets::prettyRadioButtons(inputId = "display",label = "Display:", choices = c("str", "summary"),
+                                           icon = icon("check"), bigger = F,status = "info")
+        )#,
+        #uiOutput('showVarsOut')
+      ),
+      conditionalPanel(
+        condition = "input.datatabs=='Summary Table'", br(),br(),
+        tags$style(type='text/css', css),
+        div(id = "large",
+          selectInput('groupby', 'Group by:', c('Location','Crossnumber','Mother','Father', 'FemalePloidyLevel','MalePloidyLevel','Year_of_Pollination','Month_of_Pollination'), 
+                    multiple=T, width="100%")
+        )
+        # 
+        # prettyRadioButtons('summaryShow','View', c('Table','Corr'))
+        
+        # selectInput("activity","Activity:", c("All", unique(cleantable$Activity)), multiple = T),
+        # dateRangeInput("summaryDateRange","Pollination Date Range:", format = "yyyy-mm-dd", startview = "year",
+        #                start = min(anytime::anydate(na.omit(bananadata$`First Pollination Date`))), 
+        #                end = max(anytime::anydate(na.omit(bananadata$`First Pollination Date`))),
+        #                min = min(anytime::anydate(na.omit(bananadata$`First Pollination Date`))),
+        #                max = max(anytime::anydate(na.omit(bananadata$`First Pollination Date`)))), br(),br()
+      )
+    )
+  })
+  
+  # output$summaryUI <- renderUI({
+  #   div(
+  #     if(input$summaryShow=='Table'){
+  #       DT::dataTableOutput("summaryDT")
+  #     } else if(input$summaryShow=='Corr'){
+  #       plotOutput('summaryCorr')
+  #     }
+  #   )
+  # })
   datasetInput <- reactive({
     req(input$dataset)
     
     switch(input$dataset, 
            "Flowering" = flowering,
            "Crosses" = bananadata,
-           "Plantlets" = plantlets,
+           "Plantlets" = plantlets[,-c("Crossnumber", 'Mother','Father')],
            "Status" = status,
            "Contamination" = contamination)
   })
   
-  output$sidebarControls <- renderUI({
-      if(input$datatabs == "Structure"){
-          shinyWidgets::prettyRadioButtons(inputId = "display",label = "Display:", choices = c("str", "summary"),
-                                           icon = icon("check"), bigger = F,status = "info")
-        } else if(input$datatabs =="Data Table"){
-          selectInput("showVars", "Select variables to show:",names(datasetInput()), multiple = TRUE)
-          
-        }
-      
-    
-    # else if(input$datatabs =="Visualize"){
-    #     div(
-    #       br(),
-    #       selectInput("visVars","Select variable", c(names(full_cleantable)[-c(1:3,12)]), size = "7%", selectize = F), br(),
-    #       dateRangeInput("visdateRange","Date Range:", min = datemin, max=datemax, start=datemin, end=datemax), br(),
-    #       prettySwitch(inputId = "grpBySite", label = "Group by Site", status = "success", value = T), br(),
-    #       prettyRadioButtons(inputId = "type",label = "Plot Type:", choices = c("line", "column", "bar", "spline"),icon = icon("check"), bigger = F,status = "info"), br(),
-    #       prettyRadioButtons(inputId = "stacked",label = "Stacked:", choices = c(FALSE, "normal", "percent"), icon = icon("check"), bigger = F,status = "info")
-    #   )
-    #   }
-    
-  })
+  # output$showVarsOut <- renderUI({
+  #   selectInput("showVars", "Select variables to show:",c(names(datasetInput())), multiple = TRUE)
+  # })
   
   
   output$structureOUT <- renderUI({
-    columns = names(datasetInput())
-    if(!is.null(input$showVars)){
-      columns = input$showVars
-    }
-    result = datasetInput()[,..columns, drop=FALSE]
+    result = datasetInput()
+    # columns = names(result)
+    # if(!is.null(input$showVars)){
+    #   columns = input$showVars
+    # }
+    # 
+    # if(nrow(result)>0){
+    #   result = result[,columns, drop=FALSE]  
+    # } else {
+    #   result = result[,..columns, drop=FALSE]
+    # }
+    
+    
+    #result = datasetInput()[,columns, drop=FALSE] # [,..columns, drop=FALSE]
+    # if(!is.null(input$dt_site)){
+    #   result = result[Location %in% input$dt_site]
+    # }
+    result = janitor::remove_empty(result, "cols")
+    
     
     div(
       conditionalPanel(
         condition = "input.display=='str'",
-          div(
-              fluidRow(br(),
-               tags$p(style = "color: #FF8C00; font-size: 18px;","Data structure"),
-               verbatimTextOutput("dataStr"), br()
-              ),
-              fluidRow(
-                conditionalPanel(condition = "input.dataset=='Flowering'", includeMarkdown('www/variables/flowering.md')),
-                conditionalPanel(condition = "input.dataset=='Crosses'", includeMarkdown('www/variables/bananadata.md')),
-                conditionalPanel(condition = "input.dataset=='Plantlets'", includeMarkdown('www/variables/plantlets.md')),
-                conditionalPanel(condition = "input.dataset=='Status'", includeMarkdown('www/variables/status.md')),
-                conditionalPanel(condition = "input.dataset=='Contamination'", includeMarkdown('www/variables/contamination.md')),br(),hr(), br()
-              ))
+        div(
+          fluidRow(br(),
+                   tags$p(style = "color: #FF8C00; font-size: 18px;","Data structure"),
+                   verbatimTextOutput("dataStr"), br()
+          ),
+          fluidRow(
+            conditionalPanel(condition = "input.dataset=='Flowering'", includeMarkdown('www/variables/flowering.md')),
+            conditionalPanel(condition = "input.dataset=='Crosses'", includeMarkdown('www/variables/bananadata.md')),
+            conditionalPanel(condition = "input.dataset=='Plantlets'", includeMarkdown('www/variables/plantlets.md')),
+            conditionalPanel(condition = "input.dataset=='Status'", includeMarkdown('www/variables/status.md')),
+            conditionalPanel(condition = "input.dataset=='Contamination'", includeMarkdown('www/variables/contamination.md')),br(),hr(), br()
+          ))
       ),
-    conditionalPanel(
-      condition = "input.display=='summary'",
-      fluidRow(br(),
-         tags$p(style = "color: #FF8C00; font-size: 18px;","Data summary"), 
-         print(dfSummary(result, graph.magnif = 1.0), 
-               method = 'render',
-               omit.headings = TRUE,
-               bootstrap.css = FALSE),
-               br(),hr(), br()
-          )
-       )
+      conditionalPanel(
+        condition = "input.display=='summary'",
+        fluidRow(br(),
+                 tags$p(style = "color: #FF8C00; font-size: 18px;","Data summary"), 
+                 print(dfSummary(result, graph.magnif = 1.0), 
+                       method = 'render',
+                       omit.headings = TRUE,
+                       bootstrap.css = FALSE),
+                 br(),hr(), br()
+        )
+      )
     )
   })
   
   output$dataStr <- renderPrint({
-    columns = names(datasetInput())
-    if(!is.null(input$showVars)){
-      columns = input$showVars
-    }
-    result = datasetInput()[,..columns, drop=FALSE]
+    result = datasetInput()
+    #columns = names(result)
+    # if(!is.null(input$showVars)){
+    #   columns = input$showVars
+    # }
+    # 
+    # if(nrow(result)>0){
+    #   result = result[,columns, drop=FALSE]  
+    # } else {
+    #   result = result[,..columns, drop=FALSE]
+    # }
+    
+    #result = datasetInput()[,columns, drop=FALSE] #[,..columns, drop=FALSE]
     str(result)
-    })
+  })
   
   ##################################################
   # Data Table TAB
   ##################################################
-  
-  output$viewdt <- DT::renderDataTable({
-    columns = names(datasetInput())
-    if(!is.null(input$showVars)){
-      columns = input$showVars
-    }
-    result = datasetInput()[,..columns, drop=FALSE]
+  viewInput <- reactive({
+    result = data.frame(datasetInput())
+    columns = colnames(result)
+    columns = input$showVars
+    if(input$dataset=='Crosses'){
+       if(!is.null(input$female_bar_clicked)){
+         result = result %>% dplyr::filter(Mother %in% input$female_bar_clicked[1])
+       } 
+       if(!is.null(input$male_bar_clicked)){
+         result = result %>% dplyr::filter(Father %in% input$male_bar_clicked[1])
+       }
+     }
     
-    DT::datatable(result, filter = 'top', rownames = FALSE, escape = FALSE, 
+    result = janitor::remove_empty(result, "cols")
+    colnames(result) = gsub("[.]"," ", names(result))
+    return(result)
+  })
+  output$viewdt <- DT::renderDT({
+    
+    DT::datatable(viewInput(), filter = 'top', rownames = FALSE, escape = FALSE, 
                   options = list(pageLength = 5, lengthMenu = c(5, 10, 50, 100, 500,1000),
                                  searchHighlight=T, stateSave = TRUE))
-   })
-   
+  })
+  
+  output$text <- renderPrint({
+    input$viewdt_cell_clicked$value
+  })
+  
+  
+ 
+    
   
   downloadView <- reactive({
-    columns = names(datasetInput())
-    if(!is.null(input$showVars)){
-      columns = input$showVars
-    }
-    result = datasetInput()[,..columns, drop=FALSE]
+    result = viewInput()
+    # if(!is.null(input$dt_site)){
+    #   result = result[Location %in% input$dt_site]
+    # }
+    # columns = names(result)
+    # if(!is.null(input$showVars)){
+    #   columns = input$showVars
+    # }
+    # result = result[,columns, drop=FALSE]
+    result = result[input[["viewdt_rows_all"]],]
     
     if(!is.null(input$viewdt_rows_selected)){
       result = result[input$viewdt_rows_selected,]
     }
+    
+    result = janitor::remove_empty(result, "cols")
+    result = result[complete.cases(result$Crossnumber),]
     return(result)
   })
   output$downloadTbl <- downloadHandler(
@@ -121,7 +199,60 @@ dataserver <- function(env_serv) with(env_serv, local({
       write.csv(downloadView(), file, row.names = FALSE) #datasetInput
     }
   )
+  ##################################################
+  # Summaries
   
+  summaryIn <- reactive({
+    result = bananadata %>%
+      dplyr::select(Location, Crossnumber,Mother, Father, `FemalePloidyLevel`,`MalePloidyLevel`,`First Pollination Date`,`Total Seeds`, `Good Seeds`,
+                    `Number of Embryo Rescued`,`Number of Embryo Germinating`) %>%
+      dplyr::filter(Mother !='' & Father !='')
+    
+    result$`Year_of_Pollination` = lubridate::year(result$`First Pollination Date`)
+    result$`Month_of_Pollination` = month.abb[lubridate::month(result$`First Pollination Date`)]
+    
+    if(length(input$groupby)>0){
+      result = result %>% 
+        dplyr::group_by(.dots = input$groupby)
+    } else{
+      result = result %>% 
+        dplyr::group_by(Crossnumber)
+    }
+    result = result %>% 
+      dplyr::summarise(`Number of Crosses`=n(), `Total Seeds`=sum(na.omit(as.integer(`Total Seeds`))), Good_Seeds = sum(na.omit(as.integer(`Good Seeds`))),
+                       `Number of Embryo Rescued`= sum(na.omit(as.integer(`Number of Embryo Rescued`))),
+                       `Number of Embryo Germinating`= sum(na.omit(as.integer(`Number of Embryo Germinating`))))
+  })
+  
+  output$summaryDT <- renderDataTable({
+    
+    DT::datatable(summaryIn(), filter = 'top', rownames = FALSE, escape = FALSE, 
+                  options = list(pageLength = 5, lengthMenu = c(5, 10, 50, 100, 500,1000),
+                                 searchHighlight=T, stateSave = TRUE))
+    
+  })
+  
+  
+  summaryDownload <- reactive({
+    result = summaryIn()
+    result = result[input[["summaryDT_rows_all"]],]
+    
+    if(!is.null(input$summaryDT_rows_selected)){
+      result = result[input$summaryDT_rows_selected,]
+    }
+    
+    result = janitor::remove_empty(result, "cols")
+    result = result[complete.cases(result[,1]),]
+    return(result)
+    
+  })
+  
+  output$downloadSummary <- downloadHandler(
+    filename = function(){paste0('BTracT Summary-',input$summaryDateRange[1], '-',input$summaryDateRange[2],'.csv')},
+    content = function(file) {
+      write.csv(summaryDownload(), file, row.names = FALSE) #datasetInput
+    }
+  )
   
   ##################################################
   # PIVOT TAB
