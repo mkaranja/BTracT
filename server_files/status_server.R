@@ -54,7 +54,7 @@ statusserver <- function(env_serv) with(env_serv, local({
               )
         )
       } 
-     else if(input$overview_status == "Scheduler"){
+     else if(input$overview_status == "Schedule"){
          div(
            selectizeInput("schedule_site",label = "Site:",choices = c('',unique(as.character(cleantable$Location))))
            )
@@ -369,7 +369,7 @@ statusserver <- function(env_serv) with(env_serv, local({
   )
   
 
-  # Scheduler INFORMATION
+  # Schedule INFORMATION
   
   overdue <- reactive({
     result = scheduler %>%
