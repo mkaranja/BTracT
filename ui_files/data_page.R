@@ -1,4 +1,4 @@
-library(rpivotTable)
+
 dataPage <- function()tagList(
   div(
     column(2, br(),

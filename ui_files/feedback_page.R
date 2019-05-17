@@ -1,7 +1,4 @@
-library(shinyWidgets)
-library(shinyFeedback)
-library(shinyjs)
-library(jsonlite)
+
 
 # Feedback help functions
 # which fields get saved 

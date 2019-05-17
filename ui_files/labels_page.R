@@ -1,6 +1,4 @@
 
-library(shinyWidgets)
-library(DT)
 
 labels = function() tagList(
   div(

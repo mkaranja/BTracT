@@ -1,9 +1,4 @@
-library(shiny)
-library(shinydashboard)
-library(shinyBS)
-library(shinyWidgets)
-library(ECharts2Shiny)
-library(r2d3)
+
 css <- "
 #large .selectize-input { line-height: 40px; }
 #large .selectize-dropdown { line-height: 30px; }"

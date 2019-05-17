@@ -1,8 +1,4 @@
-library(highcharter)
-library(shinyalert)
-library(collapsibleTree)
-library(shinydashboard)
-library(shinycssloaders)
+
 
 statuspage <- function()tagList(
   sidebarLayout(

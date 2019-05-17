@@ -1,7 +1,4 @@
-library(shiny)
-library(shinyWidgets)
-library(shinydashboard)
-library(shinydashboardPlus)
+
 source("ui_files/feedback_page.R")
 #source("ui_files/tissue_culture_page.R")
 

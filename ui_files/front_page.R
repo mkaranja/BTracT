@@ -1,5 +1,4 @@
-library(slickR)
-library(shinycssloaders)
+
 
 frontpage = function() tagList(
   tags$style(".topimg {
