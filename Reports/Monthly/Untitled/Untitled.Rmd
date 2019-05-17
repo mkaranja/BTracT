@@ -1,0 +1,49 @@
+---
+title: "Tutorial"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Arusha: `r month.name[lubridate::month(Sys.Date())]` - `r lubridate::year(Sys.Date())`
+
+This data table shows the number of records recorded for each activity carried out in the month of `r month.name[lubridate::month(Sys.Date())]` - `r lubridate::year(Sys.Date())`
+
+```{r, echo=FALSE}
+fname <- paste0("C:/Users/Margaret/Desktop/btract/Reports/Monthly/BTracT Monthly Report - Sendusu ", months(lubridate::date(Sys.Date()-1)),"-",lubridate::year(Sys.Date()-1),".xls")
+data = readxl::read_excel(fname)
+```
+
+
+```{r, fig.align='center', fig.pos='htb!', echo=FALSE, cache=FALSE, warning = FALSE, message = FALSE, tidy=TRUE}
+library(DT)
+datatable(data,rownames=FALSE, options = list(dom='t',ordering=F))
+```
+
+Detailed data table of the records
+
+
+```{r, fig.align='center', fig.pos='htb!', echo=FALSE, cache=FALSE, warning = FALSE, message = FALSE, tidy=TRUE}
+dname <- paste0("C:/Users/Margaret/Desktop/btract/Reports/Monthly/BTracT Monthly Report Details - Sendusu ", months(lubridate::date(Sys.Date()-1)),"-",lubridate::year(Sys.Date()-1),".xls")
+
+details = readxl::read_excel(dname)
+
+activities = unique(details$Activity)
+
+for(activity in activities){
+  data <- details %>%
+    dplyr::filter(Activity == activity) %>%
+    dplyr::filter(lubridate::month(Date)==lubridate::month(Sys.Date()-1) &  lubridate::year(as.Date(Date))==lubridate::year(Sys.Date()-1)) %>%
+  
+  print(activity)
+  library(DT)
+  print(datatable(data,rownames=FALSE, options = list(dom='t',ordering=F)))
+
+  cat('\n')
+}
+
+```
