@@ -1,14 +1,43 @@
 
 # Check if multiple R packages are installed. Install them if they are not,then load them into the R session.
 
-if(!require(pacman))install.packages("pacman")
-pacman::p_load("shiny", "shinydashboard", "shinydashboardPlus",
-               "shinysky", "shinyWidgets", "shinycssloaders", "shinyalert", "shinyFeedback", "shinyFeedback", "bsplus", "shinyBS",
-               "jsonlite","shinyjs","shinyURL",
-               "DT","summarytools","rpivotTable","qrencoder","data.table",
-               "plotly","highcharter", "collapsibleTree", "ECharts2Shiny", "r2d3", "gridBase", "RColorBrewer",
-               "rmarkdown",
-               "magrittr","plyr", "dplyr", "brapi", "WriteXLS","dataframes2xls","stringr")
+# if(!require(pacman))install.packages("pacman")
+# pacman::p_load("shiny", "shinydashboard", "shinydashboardPlus",
+#                "shinysky", "shinyWidgets", "shinycssloaders", "shinyFeedback", "shinyBS",
+#                "jsonlite","shinyjs","shinyURL",
+#                "DT","summarytools","qrencoder","data.table",
+#                "highcharter", "collapsibleTree", "rmarkdown",
+#                "magrittr","plyr", "dplyr", "brapi", "WriteXLS","dataframes2xls","stringr")
+
+suppressPackageStartupMessages(library(shiny))
+suppressPackageStartupMessages(library(shinydashboard))
+
+suppressPackageStartupMessages(library(shinysky))
+suppressPackageStartupMessages(library(shinyWidgets))
+suppressPackageStartupMessages(library(shinycssloaders))
+suppressPackageStartupMessages(library(shinyFeedback))
+suppressPackageStartupMessages(library(shinyURL))
+suppressPackageStartupMessages(library(shinyBS))
+
+suppressPackageStartupMessages(library(jsonlite))
+suppressPackageStartupMessages(library(shinyjs))
+
+suppressPackageStartupMessages(library(DT))
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(summarytools))
+suppressPackageStartupMessages(library(qrencoder))
+
+suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(highcharter))
+suppressPackageStartupMessages(library(collapsibleTree))
+
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(brapi))
+suppressPackageStartupMessages(library(WriteXLS))
+suppressPackageStartupMessages(library(dataframes2xls))
+suppressPackageStartupMessages(library(stringr))
 
 source("loaddata.R")
 source("tcload.R") # tissue culture data

@@ -102,19 +102,33 @@ bananadata = bananaploidy %>% dplyr::rename(MalePloidyLevel = ploidylevel)
 bananadata$germplasmName = NULL
 
 # Musabase Links of genotypes
-colnames(accessions_links_in_musabase) = c("Mother",'ML')
+colnames(accessions_links_in_musabase) = c("Mother",'Female Genotype')
 bananadata = dplyr::left_join(bananadata, accessions_links_in_musabase, by="Mother")
-colnames(accessions_links_in_musabase) = c("Father",'FL')
+colnames(accessions_links_in_musabase) = c("Father",'Male Genotype')
 bananadata = dplyr::left_join(bananadata, accessions_links_in_musabase, by="Father")
 
 
-bananadata = bananadata %>% dplyr::select("Location","Crossnumber","FemalePlotName","Mother","ML","FemalePloidyLevel","MalePlotName","Father","FL","MalePloidyLevel", everything())
+bananadata = bananadata %>% dplyr::select("Location","Crossnumber","FemalePlotName","Mother","Female Genotype","FemalePloidyLevel","MalePlotName","Father","Male Genotype","MalePloidyLevel", everything())
 bananadata = bananadata[!duplicated(bananadata$Crossnumber),]
 
 # Drop ID with wrong formats
 droprows = bananadata %>% dplyr::filter(substr(bananadata$Crossnumber,10,11)=="(C" | grepl("C/",bananadata$Crossnumber)==TRUE | grepl("/)",bananadata$Crossnumber[1]))
 bananadata = dplyr::anti_join(bananadata, droprows, by="Crossnumber")
 
+# Set Formats
+banana_factors = c("Location", "Mother","Father", "Female Genotype", "FemalePloidyLevel", "Male Genotype","MalePloidyLevel" )
+banana_chrs = c("Crossnumber","FemalePlotName", "MalePlotName")
+banana_int = c("Days to Maturity", "Days in ripening shed", "Seed Extraction Date","Total Seeds","Good Seeds","Number of Embryo Rescued","Number of Embryo Germinating")
+banana_dates = grep("Date", names(bananadata), value = T)
+
+# to factors
+bananadata[,banana_factors] %<>% mutate_all(as.factor)
+# to characters
+bananadata[, banana_chrs] %<>% mutate_all(as.character)
+# to integer
+bananadata[, banana_int] %<>% mutate_all(as.integer)
+# dates
+bananadata[,banana_dates] %<>% mutate_all(anytime::anydate)
 
 # Plantlets
 plantlets = list.files(patt="*Plantlets*", recursive = TRUE) %>%

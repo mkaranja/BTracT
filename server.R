@@ -35,10 +35,10 @@ shinyServer(
   env_serv = environment()
   
   # home page slide images
-  output$slickr <- renderSlickR({
-    imgs <- list.files("www/sliders/", pattern=".png", full.names = TRUE)
-    slickR(imgs)
-  })
+  # output$slickr <- renderSlickR({
+  #   imgs <- list.files("www/sliders/", pattern=".png", full.names = TRUE)
+  #   slickR(imgs)
+  # })
   
   # searchbox
   searchbox(env_serv)

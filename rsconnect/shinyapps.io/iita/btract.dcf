@@ -1,0 +1,12 @@
+name: btract
+title: btract
+username:
+account: iita
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 733123
+bundleId: 2091472
+url: https://iita.shinyapps.io/btract/
+when: 1558095014.04677
+asMultiple: FALSE
+asStatic: FALSE
