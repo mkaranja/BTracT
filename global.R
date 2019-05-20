@@ -4,12 +4,11 @@
 if(!require(pacman))install.packages("pacman")
 pacman::p_load("shiny", "shinydashboard", "shinydashboardPlus",
                "shinysky", "shinyWidgets", "shinycssloaders", "shinyalert", "shinyFeedback", "shinyFeedback", "bsplus", "shinyBS",
-               "jsonlite","shinyjs",
-               "DT","summarytools","rpivotTable","qrencoder",
+               "jsonlite","shinyjs","shinyURL",
+               "DT","summarytools","rpivotTable","qrencoder","data.table",
                "plotly","highcharter", "collapsibleTree", "ECharts2Shiny", "r2d3", "gridBase", "RColorBrewer",
                "rmarkdown",
                "magrittr","plyr", "dplyr", "brapi", "WriteXLS","dataframes2xls","stringr")
-
 
 source("loaddata.R")
 source("tcload.R") # tissue culture data
