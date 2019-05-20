@@ -146,6 +146,8 @@ dataserver <- function(env_serv) with(env_serv, local({
        if(!is.null(input$male_bar_clicked)){
          result = result %>% dplyr::filter(Father %in% input$male_bar_clicked[1])
        }
+      result = result %>%
+        dplyr::select(-Mother, -Father)
      }
     
     result = janitor::remove_empty(result, "cols")
