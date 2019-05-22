@@ -22,34 +22,36 @@ statusserver <- function(env_serv) with(env_serv, local({
   
   output$status_sidebar <- renderUI({
     if(input$overview_status == "Current details"){
-      fluidRow(br(), br(), 
-        p("This section shows the current status of accession in the breeding program.",br(), br(),
-               "Click on the plot bars to view the detailed information in the data table below", br(),br(), 
-                     "To download the plot, right click on it. Select save as picture."), br(), br(), br(),br(), br(), br(),br(), br(), br()
-      )
-      } else if(input$overview_status == "Data flow"){
-        fluidRow(
-          br(),
-          div(id = "dataflow_filters",
-              p("This plot shows movement of accessions from one activity to the next in the breeding program. ", br(),br(), 
-                     "Click on any node to see detailed information in the data table below.", br(),br(), 
-                     "To download the plot, right click on it. Select save picture as"), br(),br(), 
-              
-              selectInput("df_site","Select site",c("All",unique(cleantable$Location))), 
-              dateRangeInput("df_dateRange","Select date range:",startview = "year",start = datemin, end = datemax, min = datemin, max = datemax),
-              conditionalPanel("input.df_site !='All'",
-                                  shinyjs::useShinyjs(), br(),
-                            actionBttn('reset_dataflow',"Reset", style = "bordered",color = "primary")    
-              ), br(), br(), br()
-          
-              )
+     # div(position="fixed",
+        fluidRow(br(), br(), 
+          p("This section shows the current status of accession in the breeding program.",br(), br(),
+                 "Click on the plot bars to view the detailed information in the data table below", br(),br(), 
+                       "To download the plot, right click on it. Select save as picture."), br(), br(), br(),br(), br(), br(),br(), br(), br()
         )
-      } 
-     else if(input$overview_status == "Schedule"){
-         div(
-           selectizeInput("schedule_site",label = "Site:",choices = c('',unique(as.character(cleantable$Location))))
-           )
+        } else if(input$overview_status == "Data flow"){
+          fluidRow(
+            br(),
+            div(id = "dataflow_filters",
+                p("This plot shows movement of accessions from one activity to the next in the breeding program. ", br(),br(), 
+                       "Click on any node to see detailed information in the data table below.", br(),br(), 
+                       "To download the plot, right click on it. Select save picture as"), br(),br(), 
+                
+                selectInput("df_site","Select site",c("All",unique(cleantable$Location))), 
+                dateRangeInput("df_dateRange","Select date range:",startview = "year",start = datemin, end = datemax, min = datemin, max = datemax),
+                conditionalPanel("input.df_site !='All'",
+                                    shinyjs::useShinyjs(), br(),
+                              actionBttn('reset_dataflow',"Reset", style = "bordered",color = "primary")    
+                ), br(), br(), br()
+            
+                )
+          )
+        } 
+       else if(input$overview_status == "Schedule"){
+           div(
+             selectizeInput("schedule_site",label = "Site:",choices = c('',unique(as.character(cleantable$Location))))
+             )
        }
+     # )
   })
   
   
@@ -568,7 +570,7 @@ statusserver <- function(env_serv) with(env_serv, local({
    output$approachingTbl <- renderUI({
      if(!is.null(input$approaching_bar_clicked)){
        div(
-         column(1, offset = 11, downloadBttn('downloadApproaching',size="sm", style = 'jelly', style = 'jelly')),br(),
+         column(1, offset = 11, downloadBttn('downloadApproaching', size="sm", style = 'jelly')),br(),
          dataTableOutput("approaching_drilldown")
        )
      }

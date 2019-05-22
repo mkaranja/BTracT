@@ -1,7 +1,9 @@
 library(brapi)
 con = brapi::ba_db()$musabase
 
-femaleList = as.character(unique(bananadata$Mother))[-c(1,6, 19,20, 23)]
+femaleList = as.character(unique(bananadata$Mother))
+flist = c(grep(" ", femaleList), grep("/",femaleList))
+femaleList = femaleList[-flist]
 femaleList = femaleList[femaleList>0]
 acclist = list()
 
@@ -13,7 +15,10 @@ for(female in femaleList){
 
 
 
-maleList = as.character(unique(bananadata$Father))[-5]
+maleList = as.character(unique(bananadata$Father))
+mlist = c(grep(" ", femaleList), grep("/",femaleList))
+maleList = maleList[-mlist]
+
 maleList = maleList[maleList>0]
 
 for(male in maleList){

@@ -64,14 +64,13 @@ shinyUI(
                             br(),br(),br(),br(),
                             labels()
                    ),
-                   tabPanel("Docs",
-                            br(),br(),br(),br(),
-                            docs()
-                            )#,
-                   # tabPanel(
-                   #          a("Using BTracT", href="docs/usingbtract.html", target="_blank", icon=icon("note"))
-                   #          
-                   # )
+                   tabPanel(
+                             a("Using BTracT", href="docs/usingbtract.html", target="_blank", icon=icon("note"))
+                             
+                   ),
+                   tabPanel(
+                     a("Dashboard", href="docs/dashboard.html", target="_blank", icon=icon("note"))
+                   )#,
                  ),
         
         # log0ut = div(

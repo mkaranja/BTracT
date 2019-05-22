@@ -179,7 +179,7 @@ dataserver <- function(env_serv) with(env_serv, local({
     }
     
     result = janitor::remove_empty(result, "cols")
-    result = result[complete.cases(result$Crossnumber),]
+    #result = result[complete.cases(result$Crossnumber),]
     return(result)
   })
   output$downloadTbl <- downloadHandler(
