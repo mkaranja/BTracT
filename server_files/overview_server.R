@@ -445,17 +445,12 @@ overviewserver <- function(env_serv) with(env_serv, local({
     result = result[`First Pollination Date` %between% c(input$dateRange[1], input$dateRange[2])]
     
     div(
-      p(textOutput('clicked')),
-    # if(nrow(result)==0){
-    #   div(br(), br(), br(),br(), br(), br(),
-    #     tags$p(style = "color: green; font-size: 28px; text-align: center;","No records to display")
-    #   )
-    # } else {
-      #if(input$site=="All"){
+      
+      if(input$site=="All"){
         highcharter::highchartOutput("totals_site", height = 520)  %>% withSpinner(color="#0dc5c1")
-      # } else {
-      #   highcharter::highchartOutput("totals", height = 520)
-      # }
+       } else {
+         highcharter::highchartOutput("totals", height = 520) %>% withSpinner(color="#0dc5c1")
+       }
     #}
     )
   })
@@ -504,12 +499,9 @@ overviewserver <- function(env_serv) with(env_serv, local({
     
     colnames(result)[3]="Number of crosses"
     
-    if(input$site=='All'){
-      hc = highcharter::hchart(result, "column", hcaes(x = `Time`, y = `Number of crosses`, group = Location), events = list(click = js_bar_clicked))
-    } else {
-      hc = hchart(result, "column", hcaes(x=Time, y=`Number of crosses`),name = paste(group_name, " total crosses"), events = list(click = js_bar_clicked))
-    }
-    hc %>%
+   hc = highcharter::hchart(result, "column", hcaes(x = `Time`, y = `Number of crosses`, group = Location), events = list(click = js_bar_clicked))
+    
+   hc %>%
       hc_exporting(enabled = TRUE) %>% 
       hc_tooltip(crosshairs = TRUE, backgroundColor = "#FCFFC5", valueDecimals=0,
                  shared = TRUE, borderWidth = 2) %>%
@@ -518,7 +510,7 @@ overviewserver <- function(env_serv) with(env_serv, local({
   })
   
   
-  # Tracks the JavaScript event created by `js_click_line`
+  # Tracks the JavaScript event created by `js_bar_line`
   observe({
     dt = setDT(cleantable)
     if(input$site=="All"){
@@ -532,58 +524,60 @@ overviewserver <- function(env_serv) with(env_serv, local({
   })
   
   
-  js_click_line <- JS("function(event) {Shiny.onInputChange('line_clicked', [event.point.category]);}")
-  
   output$totals <- renderHighchart({
+    req(input$site)
     result <- bananadata %>%
       dplyr::select(Location,Crossnumber,Mother, Father,`First Pollination Date`) %>%
       dplyr::mutate(day = lubridate::day(`First Pollination Date`),
                     month = lubridate::month(`First Pollination Date`),
                     year = lubridate::year(`First Pollination Date`)) %>%
       .[complete.cases(.),]
-    result = result %>% dplyr::filter(`First Pollination Date`  %between% c(input$dateRange[1],input$dateRange[2]))
     
-    if((input$dateRange[2] - input$dateRange[1]) < 31){
-      result = result %>%
-        dplyr::filter(Location %in% input$site,
-                      `First Pollination Date`  %between% c(input$dateRange[1], input$dateRange[2])) %>%
-        dplyr::group_by(day) %>% 
-        dplyr::tally()
-      grp = result$day
-      group_name = "Daily"
-    } else if((lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1]))){
-      result <- dplyr::filter(result, Location %in% input$site,
-                              lubridate::year(`First Pollination Date`) == lubridate::year(input$dateRange[1]),
-                              lubridate::month(`First Pollination Date`) %between% c(lubridate::month(input$dateRange[1]),lubridate::month(input$dateRange[2]))) %>% 
-        dplyr::group_by(month) %>% 
-        dplyr::tally() 
-      grp = month.abb[result$month]
-      group_name = "Monthly"
-    }  else if((lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
-      result <- dplyr::filter(result, Location %in% input$site, 
-                              lubridate::year(`First Pollination Date`) %between% c(lubridate::year(input$dateRange[1]), lubridate::year(input$dateRange[2])))  %>% 
-        dplyr::group_by(year) %>% dplyr::tally()
-      
-      grp = result$year
-      group_name = "Yearly"
-    }
+    result = result %>% 
+      dplyr::filter(Location %in% input$site, 
+                    `First Pollination Date`  %between% c(input$dateRange[1],input$dateRange[2]))
     
+     if((input$dateRange[2] - input$dateRange[1]) < 31){
+       result = result %>%
+         dplyr::group_by(day) %>% 
+         dplyr::tally()  %>%
+         collect()
+       
+       grp = result$day
+       group_name = "Daily"
+     } else if((lubridate::year(input$dateRange[2]) == lubridate::year(input$dateRange[1])) & (input$dateRange[2] - input$dateRange[1]) > 31){
+       result = result %>% 
+         dplyr::group_by(month) %>% 
+         dplyr::tally()  %>%
+         collect()
+       
+       grp = month.abb[result$month]
+       group_name = "Monthly"
+     }  else if((lubridate::year(input$dateRange[2]) != lubridate::year(input$dateRange[1]))){ 
+       result  = result %>% 
+         dplyr::group_by(year) %>% 
+         dplyr::tally() %>%
+         collect()
+       
+       grp = result$year
+       group_name = "Yearly"
+     }
     
-   colnames(result)[2]="Number of crosses"
+    colnames(result)[2]="Number of crosses"
+    
     # PLOT POLLINATION
-    result = setDT(result)
-  
-    if(input$site=='All'){
-      hc = hchart(result, "column", hcaes(x=grp, y=`Number of crosses`),name = paste(group_name, " total crosses"))
-    } else {
-      
-    }
-   hc %>%
-     hc_exporting(enabled = TRUE) %>% 
-     hc_tooltip(crosshairs = TRUE, backgroundColor = "#FCFFC5", valueDecimals=0,
-                shared = TRUE, borderWidth = 2) %>%
-     hc_title(text=plotTitle()) %>%
-     hc_add_theme(hc_theme_elementary())
+    
+    highchart() %>%
+      hc_add_series(
+        data = result$`Number of crosses`, 
+        type = "column",
+        name = group_name,
+        events = list(click = js_bar_clicked)) %>%
+      hc_xAxis(
+        categories = grp,
+        tickmarkPlacement="on")
+   
+    
   })
   
   

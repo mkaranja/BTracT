@@ -36,9 +36,9 @@ tc_server <- function(env_serv) with(env_serv, local({
                       width = 330, height = "auto", br(),
                       h4("TC Label Management"),
                       selectInput(inputId = 'tc_site',label = 'Select site:',choices = c("None",sitesIn())),
-                      if(input$tc_tabs=="Crosses"){
-                        prettySwitch(inputId = "three_per_tube",label = "3-Embryos/ Test Tube", status = "success", fill = TRUE)
-                      },
+                      #if(input$tc_tabs=="Crosses"){
+                        prettySwitch(inputId = "three_per_tube",label = "3-Embryos/ Test Tube", status = "success", fill = TRUE),
+                      #},
                       uiOutput('ncopiesOut'), br(),
                       downloadBttn("downloadInfo","Download", size = "sm",style = "unite"),
                       br(),
@@ -56,7 +56,7 @@ tc_server <- function(env_serv) with(env_serv, local({
   
   output$crossesdt <- DT::renderDataTable({
     req(input$tc_site)
-    req(input$n)
+    #req(input$n)
     
     result = banana_labels %>%
       dplyr::filter(Location == input$tc_site)
@@ -71,7 +71,7 @@ tc_server <- function(env_serv) with(env_serv, local({
   
   output$embryodt <- DT::renderDataTable({
     req(input$tc_site)
-    req(input$n)
+    #req(input$n)
     
     if(exists("embryo_labels")){
     result <- embryo_labels  %>%
@@ -90,7 +90,7 @@ tc_server <- function(env_serv) with(env_serv, local({
   
   output$subculresdt <- DT::renderDataTable({
     req(input$tc_site)
-    req(input$n)
+    #req(input$n)
     if(exists("plantlet_labels")){
     result = plantlet_labels %>%
       filter(Location == input$tc_site)
@@ -108,7 +108,7 @@ tc_server <- function(env_serv) with(env_serv, local({
   
   downloadInput <- reactive({
     req(input$tc_site)
-    req(input$n)
+    #req(input$n)
     if(input$tc_tabs=="Crosses"){
       result = banana_labels  %>%
         dplyr::filter(Location == input$tc_site, sum(!is.na(`Embryo Rescue Date`))>0) %>%
@@ -118,7 +118,7 @@ tc_server <- function(env_serv) with(env_serv, local({
       if(length(s)){
         result <- result[s,]
       }
-      
+      result = result %>% dplyr::select(Crossnumber, Prefix, Suffix)
     }
     
     if(input$tc_tabs=="Embryo Germinating"){
@@ -129,6 +129,7 @@ tc_server <- function(env_serv) with(env_serv, local({
       if(length(s)){
         result <- result[s,]
       }
+      result = result %>% dplyr::select(PlantletID, Prefix, Suffix, EmbryoNo)
     }
     
     if(input$tc_tabs=="Subcultures"){
@@ -139,6 +140,7 @@ tc_server <- function(env_serv) with(env_serv, local({
       if(length(s)){
         result <- result[s,]
       }
+      result = result %>% dplyr::select(PlantletID, Prefix, Suffix, EmbryoNo)
     }
     
     if(input$three_per_tube==FALSE){
@@ -160,7 +162,7 @@ tc_server <- function(env_serv) with(env_serv, local({
       result = result[rep(row.names(result), result$n),1:4]
     }
     # return
-    return(result[,c('Crossnumber', 'Prefix', 'Suffix')])
+    return(result)
     
   })
   

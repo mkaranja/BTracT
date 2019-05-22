@@ -68,47 +68,46 @@ feedback = function() tagList(
     shinyjs::useShinyjs(),
     shinyjs::inlineCSS(appCSS),
     title = "Feedback message",
- 
     
-    fluidRow(
-      column(8, 
-             div(
-               id = "form",
-               tags$p(style = "color: orange; font-size: 24px; text-align: center;",
-                      "Leave your feedback or suggestion here"),
-               useShinyFeedback(), 
-               column(6,
-                 textInput("Name", labelMandatory("Your name"),width = '100%', placeholder = "Full Name"),
-                 textInput("Email", labelMandatory("Your email"),width = '100%', placeholder = "Email address"),
-                 textInput("Organization", labelMandatory("Organization"),width = '100%', placeholder = "Company")
-                 ),
-               column(6,
-                 textAreaInput("Message", "Message/ comment", width = '600px', height = '250px', resize = "both", placeholder = "Message")
-                 ),
-               actionBttn("submit", "Submit", style = "material-flat", size = "sm"),
-               
-               
-               shinyjs::hidden(
-                 span(id = "submit_msg", "Submitting..."),
-                 div(id = "error",
-                     div(br(), tags$b("Error: "), span(id = "error_msg"))
-                 )
-               )
-             ),
-             
-             shinyjs::hidden(
-               div(
-                 id = "thankyou_msg",
-                 h3("Thanks, your response was submitted successfully!"),
-                 actionLink("submit_another", "Submit another response")
-               )
-             )
-      ), br(), br(),
-      
-      column(10,
-             hr(), br(),
-             uiOutput("adminPanelContainer")
-      )
+        column(6, offset = 2,
+           
+              fluidRow(
+                     div(
+                         id = "form",
+                         tags$p(style = "color: orange; font-size: 24px; text-align: center;",
+                                "Leave your feedback or suggestion here"),
+                         useShinyFeedback(), 
+                         column(6,
+                           textInput("Name", labelMandatory("Your name"),width = '100%', placeholder = "Full Name"),
+                           textInput("Email", labelMandatory("Your email"),width = '100%', placeholder = "Email address"),
+                           textInput("Organization", labelMandatory("Organization"),width = '100%', placeholder = "Company")
+                           ),
+                         column(6,
+                           textAreaInput("Message", "Message/ comment", width = '600px', height = '250px', resize = "both", placeholder = "Message")
+                           ),
+                         column(1, offset = 12,
+                          actionBttn("submit", "Submit", style = "material-flat", size = "sm")
+                         ),
+                         
+                         
+                         shinyjs::hidden(
+                           span(id = "submit_msg", "Submitting..."),
+                           div(id = "error",
+                               div(br(), tags$b("Error: "), span(id = "error_msg"))
+                           )
+                         )
+                       ),
+                       
+                       shinyjs::hidden(
+                         div(
+                           id = "thankyou_msg",
+                           h3("Thanks, your response was submitted successfully!"),
+                           actionLink("submit_another", "Submit another response")
+                         )
+                       )
+                ), br(), br(),
+                   hr(), br(),
+                  uiOutput("adminPanelContainer")
     )
   )
 )

@@ -13,7 +13,7 @@ source("ui_files/status_page.R")
 source("ui_files/front_page.R")
 source("ui_files/about_page.R")
 source("ui_files/labels_page.R")
-source("ui_files/docs_page.R")
+source("ui_files/feedback_page.R")
 
 
 navbarPageWithSearchBox <- function(..., menu, refresh) {
@@ -55,23 +55,29 @@ shinyUI(
                 br(),br(),br(),br(),br(),
                  statuspage()
                  ),
+        navbarMenu("Labels",
+                 tabPanel("TC Label Management",
+                          br(),br(),br(),br(),br(),
+                          tc_page()),
+                 
+                 tabPanel("Download barcodes",
+                          br(),br(),br(),br(),
+                          labels()
+                 )
+                 
+                 ),
         navbarMenu("About",
-                   tabPanel("TC Label Management",
-                            br(),br(),br(),br(),br(),
-                            tc_page()),
-                   
-                   tabPanel("Download barcodes",
-                            br(),br(),br(),br(),
-                            labels()
+                   tabPanel(
+                             a("Using BTracT", href="docs/usingbtract.html", target="_blank", icon=icon("note"))
+                             
                    ),
-                   tabPanel("Docs",
+                   tabPanel(
+                     a("Using Dashboard", href="docs/dashboard.html", target="_blank", icon=icon("note"))
+                   ),
+                   tabPanel('Feedback',
                             br(),br(),br(),br(),
-                            docs()
-                            )#,
-                   # tabPanel(
-                   #          a("Using BTracT", href="docs/usingbtract.html", target="_blank", icon=icon("note"))
-                   #          
-                   # )
+                            feedback()
+                   )
                  ),
         
         # log0ut = div(
