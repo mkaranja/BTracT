@@ -9,20 +9,21 @@ output:
 ---
 
 This interactive web application has been designed to provide and easy-to-use interface to visualise crosses and seeds data.
-Below is a brie
+Below are details on how to explore data in the app.
 
 <br> 
 
-#### Filters
-Found on top or sidebar of the page. Useful to filter out to specific records using the site and date range.
+#### Data Filtering
+Filter your dataset using the filter controls at top or sidebar of the page
+Useful to filter out to specific records using the site and date range.
 ![](widgets/filters.gif){width=800px}
 
 <br> 
 
 <br> 
 
-#### Info- Boxes
-Info boxes provide summary counts of accessions/ crosses recorded at various stages in banana breeding using BTracT app.
+#### Summaries
+Summary information is given in the overview tab. It gives the  provide summary counts of accessions/ crosses recorded at various stages in banana breeding using BTracT app.
 These are clickable to provide detailed information in a datatable. Data is downloadable though the download button on the right corner of the table.
 
 ![](widgets/infobox.gif){width=800px}
@@ -62,7 +63,7 @@ All or filtered data maybe downloaded using the download button at the top right
 Used in Tissue Culture labs to download accession Ids for barcorde generation.
 A video demo for TC label management is available, goto > About Menu > TC Label Management > How to do it
 
-Ds generated must have gone through either of below,
+Data generated must have gone through either of below,
 
 + Embryo Culture
 + Germination
@@ -77,9 +78,14 @@ Ds generated must have gone through either of below,
 
 BTracT system is a result of dedications and efforts of different stakeholders in banana breeding project, in particular, banana breeders, field officers, developers
 
+
 + [International Institute of Tropical Agriculture](https://iita.org), IITA (Nairobi, Arusha, Sendusu, Ibadan, Onne)
 
 + [Boyce Thomsons Institute](https://btiscience.org/), BTI
+
++ [International Institute of Tropical Agriculture](https://iita.org) (Nairobi, Arusha, Sendusu, Ibadan, Onne)
+
++ [Boyce Thomsons Institute](https://btiscience.org/)
 
 <br>
 
@@ -89,7 +95,11 @@ BTracT system is a result of dedications and efforts of different stakeholders i
 
 + [Musabase](https://musabase.org)
 
+
 + [R](https://www.r-project.org/) for Statistical Computing and packages as outlined below,
+
++ R for Statistical Computing and packages as outlined below,
+
     + [shiny](https://shiny.rstudio.com/)
     + [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
     + [summarytools](https://cran.r-project.org/web/packages/summarytools/index.html) 

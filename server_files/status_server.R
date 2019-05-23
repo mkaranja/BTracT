@@ -429,7 +429,7 @@ statusserver <- function(env_serv) with(env_serv, local({
   js_overdue_bar_clicked <- JS("function(event) {Shiny.onInputChange('overdue_bar_clicked', [event.point.category]);}")
   output$overdue_summary <- renderHighchart({
     result <- overdue() %>%
-        group_by(Activity) %>%
+        group_by(NextActivity) %>%
         dplyr::tally() %>%
         arrange(desc(n)) %>%
         dplyr::collect() 
@@ -443,7 +443,7 @@ statusserver <- function(env_serv) with(env_serv, local({
       
       highchart() %>%
         hc_add_series(data = result$n, type = "column", color = '#8B0000', name = paste("Overdue accessions"),  events = list(click = js_overdue_bar_clicked)) %>%
-        hc_xAxis(categories = result$Activity,tickmarkPlacement="on") %>%
+        hc_xAxis(categories = result$NextActivity,tickmarkPlacement="on") %>%
         hc_exporting(enabled = TRUE) %>% 
         hc_tooltip(crosshairs = TRUE, backgroundColor = "#FCFFC5",
                    shared = TRUE, borderWidth = 2) %>%
@@ -464,7 +464,7 @@ statusserver <- function(env_serv) with(env_serv, local({
   overdue_drill <- reactive({
     result = overdue()
     if(!is.null(input$overdue_bar_clicked)){
-      result = result %>% dplyr::filter(Activity %in% input$overdue_bar_clicked[1])
+      result = result %>% dplyr::filter(NextActivity %in% input$overdue_bar_clicked[1])
     } 
     result = result %>%
       dplyr::arrange(desc(`Days Elapsed`))
@@ -486,7 +486,7 @@ statusserver <- function(env_serv) with(env_serv, local({
    js_ready_bar_clicked <- JS("function(event) {Shiny.onInputChange('ready_bar_clicked', [event.point.category]);}")
    output$ready_summary <- renderHighchart({
      result <- ready() %>%
-       group_by(Activity) %>%
+       group_by(NextActivity) %>%
        dplyr::tally() %>%
        arrange(desc(n)) %>%
        dplyr::collect() 
@@ -500,7 +500,7 @@ statusserver <- function(env_serv) with(env_serv, local({
      
      highchart() %>%
        hc_add_series(data = result$n, type = "column", color = '#006400', name = paste("Ready accessions"),  events = list(click = js_ready_bar_clicked)) %>%
-       hc_xAxis(categories = result$Activity,tickmarkPlacement="on") %>%
+       hc_xAxis(categories = result$NextActivity,tickmarkPlacement="on") %>%
        hc_exporting(enabled = TRUE) %>% 
        hc_tooltip(crosshairs = TRUE, backgroundColor = "#FCFFC5",
                   shared = TRUE, borderWidth = 2) %>%
@@ -521,7 +521,7 @@ statusserver <- function(env_serv) with(env_serv, local({
    ready_drill <- reactive({
      result = ready()
      if(!is.null(input$ready_bar_clicked)){
-       result = result %>% dplyr::filter(Activity %in% input$ready_bar_clicked[1])
+       result = result %>% dplyr::filter(NextActivity %in% input$ready_bar_clicked[1])
      } 
      result = result %>%
        dplyr::arrange(desc(`Days Elapsed`))
@@ -542,7 +542,7 @@ statusserver <- function(env_serv) with(env_serv, local({
    js_approaching_bar_clicked <- JS("function(event) {Shiny.onInputChange('approaching_bar_clicked', [event.point.category]);}")
    output$approaching_summary <- renderHighchart({
      result <- approaching() %>%
-       group_by(Activity) %>%
+       group_by(NextActivity) %>%
        dplyr::tally() %>%
        arrange(desc(n)) %>%
        dplyr::collect() 
@@ -553,14 +553,14 @@ statusserver <- function(env_serv) with(env_serv, local({
      } else if(input$site ==""){
        paste("Accessions almost ready for recording as of ", Sys.Date())
      }
-     
+     result = setDT(result)
      highchart() %>%
-       hc_add_series(data = result$n, type = "column", color = '#00CED1', name = paste("Approaching accessions"),  events = list(click = js_approaching_bar_clicked)) %>%
-       hc_xAxis(categories = result$Activity,tickmarkPlacement="on") %>%
+       hc_add_series(data = result[["n"]], type = "column", color = '#00CED1', name = paste("Approaching accessions"),  events = list(click = js_approaching_bar_clicked)) %>%
+       hc_xAxis(categories = result[["NextActivity"]],tickmarkPlacement="on") %>%
        hc_exporting(enabled = TRUE) %>% 
        hc_tooltip(crosshairs = TRUE, backgroundColor = "#FCFFC5",
                   shared = TRUE, borderWidth = 2) %>%
-       hc_title(text=ptitle) %>%
+       #hc_title(text=ptitle) %>%
        hc_add_theme(hc_theme_elementary())
      
    })
@@ -568,17 +568,22 @@ statusserver <- function(env_serv) with(env_serv, local({
    # display the subsetted data
    
    output$approachingTbl <- renderUI({
+     
      if(!is.null(input$approaching_bar_clicked)){
        div(
+         verbatimTextOutput('txt3'),
          column(1, offset = 11, downloadBttn('downloadApproaching', size="sm", style = 'jelly')),br(),
          dataTableOutput("approaching_drilldown")
        )
      }
    })
+   output$txt3 <- renderPrint({
+     input$approaching_bar_clicked
+   })
    approaching_drill <- reactive({
      result = approaching()
      if(!is.null(input$approaching_bar_clicked)){
-       result = result %>% dplyr::filter(Activity %in% input$approaching_bar_clicked[1])
+       result = result %>% dplyr::filter(NextActivity %in% input$approaching_bar_clicked[1])
      } 
      result = result %>%
        dplyr::arrange(desc(`Days Elapsed`))

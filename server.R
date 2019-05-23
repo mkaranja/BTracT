@@ -59,7 +59,7 @@ shinyServer(
   feedbackserver(env_serv)
   
   # labels
-   #labels(env_serv)
+  labels(env_serv)
   
   # Update data
   # Docs

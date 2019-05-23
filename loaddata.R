@@ -44,17 +44,17 @@ crosses = list.files(patt="BananaData.csv$", recursive = TRUE) %>%
 crosses %<>% mutate_all(as.character)
 crosses = dplyr::select(crosses, -c("Number_Sent_for_Embryo_Rescue","Early_Germination_Seeds"))
 #******************************************************
-crosses = setDT(crosses)[crosses[, .I[which.min(Reduce(`+`, lapply(.SD, is.na)))], Crossnumber]$V1]
-
-# previous records
-arusha_legacy_crosses = fread("data/Last_6_months_tisssue_culture_data.csv")
-rmcol = c("contamination","badseeds",grep("^days", names(arusha_legacy_crosses), value = T))
-arusha_legacy_crosses = arusha_legacy_crosses[, (rmcol) := NULL][] %>% # drop unwanted columns
-  setnames(colnames(.), c("Location","Crossnumber","Mother","Father","First_Pollination_Date","Bunch_Harvest_Date", "Seed_Extraction_Date",
-                          "Total_Seeds","Good_Seeds","Number_of_Embryo_Rescued", "Embryo_Rescue_Date", "Germination_Date",                  
-                          "Number_of_Embryo_Germinating"))
+banana = setDT(crosses)[crosses[, .I[which.min(Reduce(`+`, lapply(.SD, is.na)))], Crossnumber]$V1]
+banana = data.frame(banana)
+# # previous records
+# arusha_legacy_crosses = fread("data/Last_6_months_tisssue_culture_data.csv")
+# rmcol = c("contamination","badseeds",grep("^days", names(arusha_legacy_crosses), value = T))
+# arusha_legacy_crosses = arusha_legacy_crosses[, (rmcol) := NULL][] %>% # drop unwanted columns
+#   setnames(colnames(.), c("Location","Crossnumber","Mother","Father","First_Pollination_Date","Bunch_Harvest_Date", "Seed_Extraction_Date",
+#                           "Total_Seeds","Good_Seeds","Number_of_Embryo_Rescued", "Embryo_Rescue_Date", "Germination_Date",                  
+#                           "Number_of_Embryo_Germinating"))
 # merge crosses and previous datasets
-banana =rbind.fill(crosses, arusha_legacy_crosses)
+#banana =rbind.fill(crosses, arusha_legacy_crosses)
 banana_dates = grep("_Date", names(banana), value = T)
 banana[,banana_dates] %<>% mutate_all(anytime::anydate)
 
@@ -146,7 +146,7 @@ plantlets$Crossnumber = paste0(plants_Id[,1],"_",plants_Id[,2])
 plantlets = dplyr::left_join(plantlets, bananadata[,c("Crossnumber","Mother","Father")], by="Crossnumber")
 }
 
-plantlets = dplyr::select(plantlets, -c(".id","Embryo Rescue Date","Good Seeds","Number of Embryo Rescued", contains("Status")))
+plantlets = dplyr::select(plantlets, -c(".id", contains("Status")))
 
 plantlets = plantlets %>% dplyr::select(Location, PlantletID, everything()) %>% setDT()
 
