@@ -87,6 +87,11 @@ BTracT system is a result of dedications and efforts of different stakeholders i
 
 + [Boyce Thomsons Institute](https://btiscience.org/)
 
++ [International Institute of Tropical Agriculture](https://iita.org), IITA (Nairobi, Arusha, Sendusu, Ibadan, Onne)
+
++ [Boyce Thomsons Institute](https://btiscience.org/), BTI
+
+
 <br>
 
 #### Software/ Platforms
@@ -97,8 +102,6 @@ BTracT system is a result of dedications and efforts of different stakeholders i
 
 
 + [R](https://www.r-project.org/) for Statistical Computing and packages as outlined below,
-
-+ R for Statistical Computing and packages as outlined below,
 
     + [shiny](https://shiny.rstudio.com/)
     + [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
