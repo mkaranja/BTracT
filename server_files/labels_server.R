@@ -4,8 +4,7 @@ labels <- function(env_serv) with(env_serv, local({
   # only today's data should be displayed
   
   labelsInput <- reactive({
-    bananadata[,c("Location","Crossnumber","FemalePlotName","Mother","MalePlotName","Father","First Pollination Date")] %>%
-      dplyr::filter(`First Pollination Date` >= (Sys.Date()-1))
+    bananadata[,c("Location","Crossnumber","FemalePlotName","Mother","MalePlotName","Father","First Pollination Date")]
   })
   
   output$labelsDT <- DT::renderDataTable({
