@@ -1,0 +1,33 @@
+---
+title: <span style='color:orange'>BTracT Dashboard</span>
+output:
+  html_document:
+    theme: paper
+    highlight: haddock 
+    css: styles.css
+
+---
+
++ shiny <br> 
++ shinyWidgets <br> 
++ shinycssloaders <br>  
++ shinyFeedback <br> 
++ shinyBS <br>
++ jsonlite <br>
++ shinyjs <br>
++ shinyURL <br>
++ DT <br>
++ summarytools <br>
++ qrencoder <br>
++ data.table <br>
++ highcharter, 
++ collapsibleTree, 
++ rmarkdown,
++ magrittr,
++ plyr, 
++ dplyr, 
++ brapi, 
++ WriteXLS,
++ dataframes2xls,
++ stringr
++ janitor
