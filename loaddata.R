@@ -44,17 +44,17 @@ crosses = list.files(patt="BananaData.csv$", recursive = TRUE) %>%
 crosses %<>% mutate_all(as.character)
 crosses = dplyr::select(crosses, -c("Number_Sent_for_Embryo_Rescue","Early_Germination_Seeds"))
 #******************************************************
-banana = setDT(crosses)[crosses[, .I[which.min(Reduce(`+`, lapply(.SD, is.na)))], Crossnumber]$V1]
-banana = data.frame(banana)
+crosses = setDT(crosses)[crosses[, .I[which.min(Reduce(`+`, lapply(.SD, is.na)))], Crossnumber]$V1]
+# banana = data.frame(banana)
 # # previous records
-# arusha_legacy_crosses = fread("data/Last_6_months_tisssue_culture_data.csv")
-# rmcol = c("contamination","badseeds",grep("^days", names(arusha_legacy_crosses), value = T))
-# arusha_legacy_crosses = arusha_legacy_crosses[, (rmcol) := NULL][] %>% # drop unwanted columns
-#   setnames(colnames(.), c("Location","Crossnumber","Mother","Father","First_Pollination_Date","Bunch_Harvest_Date", "Seed_Extraction_Date",
-#                           "Total_Seeds","Good_Seeds","Number_of_Embryo_Rescued", "Embryo_Rescue_Date", "Germination_Date",                  
-#                           "Number_of_Embryo_Germinating"))
+ arusha_legacy_crosses = fread("data/Last_6_months_tisssue_culture_data.csv")
+ rmcol = c("contamination","badseeds",grep("^days", names(arusha_legacy_crosses), value = T))
+ arusha_legacy_crosses = arusha_legacy_crosses[, (rmcol) := NULL][] %>% # drop unwanted columns
+   setnames(colnames(.), c("Location","Crossnumber","Mother","Father","First_Pollination_Date","Bunch_Harvest_Date", "Seed_Extraction_Date",
+                           "Total_Seeds","Good_Seeds","Number_of_Embryo_Rescued", "Embryo_Rescue_Date", "Germination_Date",                  
+                           "Number_of_Embryo_Germinating"))
 # merge crosses and previous datasets
-#banana =rbind.fill(crosses, arusha_legacy_crosses)
+banana =rbind.fill(crosses, arusha_legacy_crosses)
 banana_dates = grep("_Date", names(banana), value = T)
 banana[,banana_dates] %<>% mutate_all(anytime::anydate)
 
@@ -110,6 +110,30 @@ bananadata = dplyr::left_join(bananadata, accessions_links_in_musabase, by="Fath
 
 bananadata = bananadata %>% dplyr::select("Location","Crossnumber","FemalePlotName","Mother","Female Genotype","FemalePloidyLevel","MalePlotName","Father","Male Genotype","MalePloidyLevel", everything())
 bananadata = bananadata[!duplicated(bananadata$Crossnumber),]
+
+# update plotnames
+# FemalePlotNames
+germplasm_info_arusha = fread("data/germplasm_info_Arusha.csv")[,2:3] 
+germplasm_info_arusha %<>% mutate_all(as.character)
+
+colnames(germplasm_info_arusha)[2] = "FemalePlotName"
+plots = dplyr::left_join(bananadata[,2:3], germplasm_info_arusha, by='FemalePlotName') %>%
+  .[,-2] %>%
+  .[complete.cases(.),]
+
+bananadata = dplyr::left_join(bananadata, plots, by="Crossnumber")
+bananadata$FemalePlotName = ifelse(!is.na(bananadata$ObservationUnitName), bananadata$ObservationUnitName, bananadata$FemalePlotName)
+bananadata$ObservationUnitName = NULL
+
+# MalePlotNames
+colnames(germplasm_info_arusha)[2] = "MalePlotName"
+plots = dplyr::left_join(bananadata[,c(2,7)], germplasm_info_arusha, by='MalePlotName') %>%
+  .[,-2] %>%
+  .[complete.cases(.),]
+
+bananadata = dplyr::left_join(bananadata, plots, by="Crossnumber")
+bananadata$MalePlotName = ifelse(!is.na(bananadata$ObservationUnitName), bananadata$ObservationUnitName, bananadata$MalePlotName)
+bananadata$ObservationUnitName = NULL
 
 # Drop ID with wrong formats
 droprows = bananadata %>% dplyr::filter(substr(bananadata$Crossnumber,10,11)=="(C" | grepl("C/",bananadata$Crossnumber)==TRUE | grepl("/)",bananadata$Crossnumber[1]))

@@ -449,7 +449,7 @@ overviewserver <- function(env_serv) with(env_serv, local({
       if(input$site=="All"){
         highcharter::highchartOutput("totals_site", height = 520)  %>% withSpinner(color="#0dc5c1")
        } else {
-         highcharter::highchartOutput("totals", height = 520) %>% withSpinner(color="#0dc5c1")
+         highcharter::highchartOutput("totals", height = 520) #%>% withSpinner(color="#0dc5c1")
        }
     #}
     )
