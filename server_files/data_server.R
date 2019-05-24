@@ -163,7 +163,19 @@ dataserver <- function(env_serv) with(env_serv, local({
   
   
   downloadView <- reactive({
-    result = viewInput()
+    result = data.frame(datasetInput())
+    columns = colnames(result)
+    columns = input$showVars
+    if(input$dataset=='Crosses'){
+      if(!is.null(input$female_bar_clicked)){
+        result = result %>% dplyr::filter(Mother %in% input$female_bar_clicked[1])
+      } 
+      if(!is.null(input$male_bar_clicked)){
+        result = result %>% dplyr::filter(Father %in% input$male_bar_clicked[1])
+      }
+      result = result %>%
+        dplyr::select(-ends_with('Genotype'))
+    }
     # if(!is.null(input$dt_site)){
     #   result = result[Location %in% input$dt_site]
     # }
@@ -178,6 +190,7 @@ dataserver <- function(env_serv) with(env_serv, local({
       result = result[input$viewdt_rows_selected,]
     }
     
+    colnames(result) = gsub("[.]"," ", names(result))
     result = janitor::remove_empty(result, "cols")
     #result = result[complete.cases(result$Crossnumber),]
     return(result)
