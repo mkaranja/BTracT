@@ -7,9 +7,9 @@ labels = function() tagList(
       
       column(2, 
              wellPanel(
-                selectInput('label_value','Value:', c("Crossnumber","FemalePlotName","MalePlotName","Mother","Father")),
+                selectInput('barcode_value','Barcode value:', c("Crossnumber","FemalePlotName","MalePlotName","Mother","Father")),
                 
-                selectInput('label_label', 'Label:', c("Crossnumber","FemalePlotName","MalePlotName","Mother","Father")),
+                selectInput('barcode_label', 'Barcode label:', c("Crossnumber","FemalePlotName","MalePlotName","Mother","Father")),
                shinyWidgets::prettyRadioButtons(inputId = "format",label = "Label format:", choices = c("Pre-defined", "Custom"),
                                                 icon = icon("check"), bigger = F,status = "info", inline = T), br(),
               uiOutput('labelformat'),

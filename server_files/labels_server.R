@@ -4,7 +4,8 @@ labels <- function(env_serv) with(env_serv, local({
   # only today's data should be displayed
   
   labelsInput <- reactive({
-    bananadata[,c("Location","Crossnumber","FemalePlotName","Mother","MalePlotName","Father","First Pollination Date")]
+    bananadata[,c("Location","Crossnumber","FemalePlotName","Mother","MalePlotName","Father","First Pollination Date")] %>%
+      dplyr::filter(`First Pollination Date` >= (Sys.Date()-1))
   })
   
   output$labelsDT <- DT::renderDataTable({
@@ -146,8 +147,8 @@ labels <- function(env_serv) with(env_serv, local({
            pdf(file, width=pgwidth(), height = pgheight(), paper = paperIn(), pagecentre=F)
            par(mfrow=c(pgrows(),pgcols()),mar=label_mar(), oma=label_oma()) # margins: mar=c(b,l,t,r); oma=c(b,l,t,r)
            for(i in 1:(nrow(downloadlabelsIn()))){
-               image(qrencode_raster(as.character(downloadlabelsIn()[i,input$label_value])), 
-                     main = as.character(downloadlabelsIn()[i,input$label_value]), sub = as.character(downloadlabelsIn()[i,input$label_label]),
+               image(qrencode_raster(as.character(downloadlabelsIn()[i,input$barcode_value])), 
+                     main = as.character(downloadlabelsIn()[i,input$barcode_value]), sub = as.character(downloadlabelsIn()[i,input$barcode_label]),
                            cex.main = 1.5, cex.sub = 1, asp=1, col=c("white", "black"), axes=F, 
                      xlab="", ylab="")
              }

@@ -59,12 +59,8 @@ shinyServer(
   feedbackserver(env_serv)
   
   # labels
-<<<<<<< HEAD
   labels(env_serv)
-=======
-   labels(env_serv)
->>>>>>> d2023a89270da9c3b109e1a3267804bb4535a9c0
-  
+ 
   # Update data
   # Docs
   
