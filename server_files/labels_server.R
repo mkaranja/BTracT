@@ -146,8 +146,8 @@ labels <- function(env_serv) with(env_serv, local({
            pdf(file, width=pgwidth(), height = pgheight(), paper = paperIn(), pagecentre=F)
            par(mfrow=c(pgrows(),pgcols()),mar=label_mar(), oma=label_oma()) # margins: mar=c(b,l,t,r); oma=c(b,l,t,r)
            for(i in 1:(nrow(downloadlabelsIn()))){
-               image(qrencode_raster(as.character(downloadlabelsIn()[i,2])), 
-                     main = as.character(downloadlabelsIn()[i,2]), sub = as.character(downloadlabelsIn()[i,3]),
+               image(qrencode_raster(as.character(downloadlabelsIn()[i,input$label_value])), 
+                     main = as.character(downloadlabelsIn()[i,input$label_value]), sub = as.character(downloadlabelsIn()[i,input$label_label]),
                            cex.main = 1.5, cex.sub = 1, asp=1, col=c("white", "black"), axes=F, 
                      xlab="", ylab="")
              }
