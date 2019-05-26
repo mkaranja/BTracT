@@ -374,3 +374,42 @@ Finalize the record and <b>Save and exit </b> to save the record.
 # Reprint barcodes
 
 # Troubleshoot the device (mobile app)
+
+### Ensure data synch to server
+
+After finalizing and saving the form, sometimes the data is not sent to the server.
+
+To check if indeed data hasn't been sent, go to the <b>Main menu.</b> <br>
+If a number aggregates at <b>'Edit form' </b> and <b>'Send saved forms'</b>, then data is still in the device and need to be submitted to the server manually. 
+
+![](odk_configuration/troubleshoot/not_synching.jpeg)
+
+<br>
+
+To do that, click on <b>Send Finalized Forms</b>, select all the records in the resulting window and click on <b> Send Selected</b> at the bottom.
+
+![](odk_configuration/troubleshoot/send_finalized.jpeg)
+
+<br>
+A success upload is displayed by a pop-up message as shown below
+
+![](odk_configuration/troubleshoot/submitted.jpeg)
+
+To ensure data is synch automatically refer to, [Device setup]
+
+<br>
+
+### Error: Not exactly one blank form that matches the id
+
+This means that there are two or more versions of the form and the device can't pick which form to associate the data with.
+
+![](odk_configuration/troubleshoot/multi_forms.jpeg)
+
+<br>
+
+To proceed, remove the old versions and retain only one copy. To do this, on <b>Main menu</b>, click <b>Delete</b>, select all old versions to remove them by clicking <b> Delete Selected</b> at the bottom of the page.
+
+![](odk_configuration//troubleshoot/keep_one.jpeg)
+
+
+Now submit the forms to the server, refer, [Ensure data synch to server]

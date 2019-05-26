@@ -1,6 +1,6 @@
 
-#source('accessions_links_in_musabase.R')
 accessions_links_in_musabase = fread('data/accessions_links_in_musabase.csv')
+germplasm_info_arusha = fread("data/germplasm_info_Arusha.csv")[,2:3] 
 
 #setwd("./data")
 # Load data 
@@ -113,7 +113,6 @@ bananadata = bananadata[!duplicated(bananadata$Crossnumber),]
 
 # update plotnames
 # FemalePlotNames
-germplasm_info_arusha = fread("data/germplasm_info_Arusha.csv")[,2:3] 
 germplasm_info_arusha %<>% mutate_all(as.character)
 
 colnames(germplasm_info_arusha)[2] = "FemalePlotName"

@@ -83,15 +83,6 @@ BTracT system is a result of dedications and efforts of different stakeholders i
 
 + [Boyce Thomsons Institute](https://btiscience.org/), BTI
 
-+ [International Institute of Tropical Agriculture](https://iita.org) (Nairobi, Arusha, Sendusu, Ibadan, Onne)
-
-+ [Boyce Thomsons Institute](https://btiscience.org/)
-
-+ [International Institute of Tropical Agriculture](https://iita.org), IITA (Nairobi, Arusha, Sendusu, Ibadan, Onne)
-
-+ [Boyce Thomsons Institute](https://btiscience.org/), BTI
-
-
 <br>
 
 #### Software/ Platforms
