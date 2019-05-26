@@ -64,12 +64,12 @@ statusserver <- function(env_serv) with(env_serv, local({
     y = data.frame(rowSums(table(v$V1,v$V2)))
     colnames(y) = "Number"
     z = tibble::rownames_to_column(y, var="Location")
-    z = data_frame(name = z$Location,y = z$Number, drilldown = tolower(name))
+    z = tibble(name = z$Location,y = z$Number, drilldown = tolower(name))
     
     for(i in 1:nrow(z)){
       p = data[data$Location == paste0("",z$name[i],""),]
       pp = data.table(table(p$Activity)) %>% filter(N >0)
-      ppp <- arrange(data_frame(name = pp$V1,value = pp$N),desc(value))
+      ppp <- arrange(tibble(name = pp$V1,value = pp$N),desc(value))
       
       assign(paste0("z",i),p)
       assign(paste0("z2",i),pp)
